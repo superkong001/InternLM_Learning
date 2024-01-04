@@ -8,9 +8,11 @@
 GeForce RTX2080、2080ti
 GeForce RTX3060-3090ti 
 GeForce RTX4060~4090 
+
 数据中心
 Teala T4、v100 
 A10、A100、H100 
+
 ·训练方案覆盖NVIDIA20系以上所有显卡
 ·最低只需8GB显存即可微调7B模型
 <img width="959" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cb6d574f-fb80-4348-a81a-f8f985aa076a">
