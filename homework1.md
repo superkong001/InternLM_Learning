@@ -9,6 +9,7 @@
 ![Uploading 计算题.png…]()
 第二次尝试同一个问题，回答错误：
 <img width="737" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/7061c81a-6c2e-489b-ba03-38bec73d1c95">
+
 使用huggingface下载模型
 <img width="1041" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/113325f5-a1b0-4096-880f-2af795402421">
 
