@@ -20,6 +20,8 @@ A10、A100、H100
 <img width="959" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cb6d574f-fb80-4348-a81a-f8f985aa076a">
 <img width="1037" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fc0108d8-48dd-4ff2-af8f-efe039166508">
 <img width="916" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/da247e43-ad5f-4f33-a0a5-ff68e081542f">
+<img width="966" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3d1c9a46-c0d9-4c6b-8d78-16cd02730d6f">
+
 
 
 
