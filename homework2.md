@@ -71,13 +71,21 @@ unzip averaged_perceptron_tagger.zip
 将远程开源仓库 Clone 到本地，可以使用以下命令：
 
 # 进入到数据库盘
+
 cd /root/data
-# clone 上述开源仓库
+
+# clone 开源仓库
+
 git clone https://gitee.com/open-compass/opencompass.git
+
 git clone https://gitee.com/InternLM/lmdeploy.git
+
 git clone https://gitee.com/InternLM/xtuner.git
+
 git clone https://gitee.com/InternLM/InternLM-XComposer.git
+
 git clone https://gitee.com/InternLM/lagent.git
+
 git clone https://gitee.com/InternLM/InternLM.git
 
 <img width="478" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b564bbdc-8566-4628-9a0d-874e38132e29">
