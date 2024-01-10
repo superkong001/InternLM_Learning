@@ -44,8 +44,20 @@ RAG优化建议
 
 WEB部署框架：Gradio、Streamlit
 
+下载 NLTK 相关资源
+
 <img width="725" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/56246547-1caa-4e5f-9756-4ad65bda4b2d">
 
+下载 nltk 资源并解压到服务器上
+
+cd /root
+git clone https://gitee.com/yzy0612/nltk_data.git  --branch gh-pages
+cd nltk_data
+mv packages/*  ./
+cd tokenizers
+unzip punkt.zip
+cd ../taggers
+unzip averaged_perceptron_tagger.zip
 
 
 
