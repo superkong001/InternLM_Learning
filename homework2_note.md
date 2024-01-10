@@ -31,9 +31,19 @@ vectordb = Chroma.from_documents(
 )
 # 将加载的向量数据库持久化到磁盘上
 vectordb.persist()
+
 <img width="449" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0e45ddac-d4da-4d52-9cf3-4e84f4de902a">
 
 构建检索问答链
+
 <img width="522" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/1390e238-b74a-4684-b66e-9ae26bbce832">
+
+RAG优化建议
+
+<img width="383" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/aca4ef79-6396-40ed-94a2-0949fe0100da">
+
+WEB部署框架：Gradio、Streamlit
+
+
 
 
