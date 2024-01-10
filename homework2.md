@@ -94,6 +94,12 @@ git clone https://gitee.com/InternLM/InternLM.git
 
 <img width="766" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/79d63b41-efe8-4bca-9d11-f3d69f54f0f6">
 
+运行提示的IP又不对。。。
+
+<img width="541" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/882461f6-794b-4862-8f7e-dce5246a4ccf">
+
+<img width="742" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/10fb7d3b-dbd7-4505-975a-c9035a4a58e5">
+
 <img width="752" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/5568013b-53f9-4e0d-b4de-60ec9405773d">
 
 
