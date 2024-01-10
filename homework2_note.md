@@ -10,6 +10,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=500, chunk_overlap=150)
+    
 split_docs = text_splitter.split_documents(docs)
 
 2.接着对文本块进行向量化：开源词向量模型 Sentence Transformer 来进行文本向量化
@@ -51,12 +52,19 @@ WEB部署框架：Gradio、Streamlit
 下载 nltk 资源并解压到服务器上
 
 cd /root 
+
 git clone https://gitee.com/yzy0612/nltk_data.git  --branch gh-pages 
+
 cd nltk_data 
+
 mv packages/*  ./ 
+
 cd tokenizers 
+
 unzip punkt.zip 
+
 cd ../taggers 
+
 unzip averaged_perceptron_tagger.zip 
 
 
