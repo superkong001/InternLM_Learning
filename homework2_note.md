@@ -73,7 +73,9 @@ unzip averaged_perceptron_tagger.zip
 
 IP改成0.0.0.0成功了，但第一次提问，输出乱码。。。
 
-![Uploading image.png…]()
+<img width="703" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3304ff7c-4d36-4897-b237-24c6cf61edc0">
+
+
 
 
 
