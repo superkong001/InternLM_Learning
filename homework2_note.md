@@ -44,6 +44,9 @@ RAG优化建议
 
 WEB部署框架：Gradio、Streamlit
 
+<img width="725" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/56246547-1caa-4e5f-9756-4ad65bda4b2d">
+
+
 
 
 
