@@ -1,4 +1,5 @@
 <img width="361" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/50b96e91-3359-40ca-a010-70fe45f69d2d">
+RAG
 
 <img width="293" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/de5ba156-4de9-4e4f-9418-fb854ce2ff4d">
 
