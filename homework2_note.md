@@ -67,6 +67,16 @@ cd ../taggers
 
 unzip averaged_perceptron_tagger.zip 
 
+运行提示的IP又不对
+
+<img width="742" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d9390591-f3f1-4b23-8af9-e1381a73bb3f">
+
+IP改成0.0.0.0成功了，但第一次提问，输出乱码。。。
+
+![Uploading image.png…]()
+
+
+
 
 
 
