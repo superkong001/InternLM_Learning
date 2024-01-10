@@ -11,6 +11,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=500, chunk_overlap=150)
 split_docs = text_splitter.split_documents(docs)
+
 2.接着对文本块进行向量化：开源词向量模型 Sentence Transformer 来进行文本向量化
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 
@@ -31,4 +32,8 @@ vectordb = Chroma.from_documents(
 # 将加载的向量数据库持久化到磁盘上
 vectordb.persist()
 <img width="449" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0e45ddac-d4da-4d52-9cf3-4e84f4de902a">
+
+构建检索问答链
+<img width="522" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/1390e238-b74a-4684-b66e-9ae26bbce832">
+
 
