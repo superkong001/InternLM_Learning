@@ -1,4 +1,8 @@
-# 指令微调：
+# 课程笔记
+
+## 理论
+
+### 指令微调：
 
 <img width="405" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/f59cda06-ef89-4345-8161-e88ee401a035">
 
@@ -10,7 +14,7 @@
 
 <img width="779" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6f45ac61-4dbc-4e23-a5dd-b66a0e455767">
 
-# 增量预训练微调：
+### 增量预训练微调：
 
 <img width="722" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/58929c33-16ae-4a2a-bbc4-f9082d1fc2ea">
 
@@ -36,7 +40,7 @@ XTuner
 
 XTuner 还支持工具类模型的对话,更多详见HuggingFace Hub(xtuner/Llama-2-7b-qlora-moss-003-sft)
 
-# 数据引擎
+### 数据引擎
 
 <img width="368" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d6c60b91-b553-4ebb-8b23-8c7bb7c97be0">
 
@@ -52,7 +56,8 @@ QLoRA用deepspeed_zero2
 
 <img width="656" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/7c189877-758f-4a6e-8523-d741e7598fc5">
 
-# 使用TMUX：(使用这个工具在终端SSH连接后，不会中断微调工作)
+## 操作
+### 使用TMUX：(使用这个工具在终端SSH连接后，不会中断微调工作)
 
 apt update -y
 
@@ -105,7 +110,8 @@ xtuner chat ./merged --bits 4 --prompt-template internlm_chat
 
 --seed	用于可重现文本生成的随机种子，指定后可以保证每次随机种子一致
 
-# 自定义微调
+# 实操
+
 
 
 
