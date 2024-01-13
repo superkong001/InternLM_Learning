@@ -52,6 +52,23 @@ QLoRA用deepspeed_zero2
 
 <img width="656" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/7c189877-758f-4a6e-8523-d741e7598fc5">
 
+使用TMUX：(使用这个工具在终端SSH连接后，不会中断微调工作)
+
+apt update -y
+
+apt install tmux -y
+
+创建并进入tumx环境
+tmux new -s finetune 
+
+退出Ctrl+B再按D，再进入
+
+tmux attach -t finetune
+
+
+
+
+
 
 
 
