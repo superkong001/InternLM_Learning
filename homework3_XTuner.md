@@ -14,7 +14,9 @@
 
 <img width="722" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/58929c33-16ae-4a2a-bbc4-f9082d1fc2ea">
 
-<img width="719" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4e880dac-df49-4d2f-9e19-ee2afbcb023f">
+<img width="774" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6b15eac4-7894-4b00-ac52-c85c2259b3f1">
+
+LoRA (stable diffusion https://baijiahao.baidu.com/s?id=1765945330332903494&wfr=spider&for=pc)
 
 
 
