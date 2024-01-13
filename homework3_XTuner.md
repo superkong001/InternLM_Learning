@@ -68,10 +68,13 @@ tmux attach -t finetune
 internlm_chat_7b_qlora_oasst1_e3 (模型名_方法qlora/lora_数据集_epoch3代表3轮，输出3个lora文件)
 
 #单卡
+
 ##用刚才改好的config文件训练
+
 xtuner train ./internlm_chat_7b_qlora_oasst1_e3_copy.py --deepspeed deepspeed_zero2
 
 #多卡
+
 NPROC_PER_NODE=${GPU_NUM} xtuner train ./internlm_chat_7b_qlora_oasst1_e3_copy.py --deepspeed deepspeed_zero2
 
 #--deepspeed deepspeed_zero2, 开启 deepspeed 加速
@@ -79,6 +82,7 @@ NPROC_PER_NODE=${GPU_NUM} xtuner train ./internlm_chat_7b_qlora_oasst1_e3_copy.p
 LoRA文件转成HuggingFace格式：
 
 mkdir hf
+
 export MKL_SERVICE_FORCE_INTEL=1
 
 xtuner convert pth_to_hf ./internlm_chat_7b_qlora_oasst1_e3_copy.py ./work_dirs/internlm_chat_7b_qlora_oasst1_e3_copy/epoch_1.pth ./hf
@@ -90,12 +94,15 @@ xtuner convert merge ./internlm-chat-7b ./hf ./merged --max-shard-size 2GB
 与合并后的模型对话：
 
 #加载 Adapter 模型对话（Float 16）
+
 xtuner chat ./merged --prompt-template internlm_chat
 
 #4 bit 量化加载
+
 xtuner chat ./merged --bits 4 --prompt-template internlm_chat
 
 --temperature	温度值，值0~1，越大回复越随机
+
 --seed	用于可重现文本生成的随机种子，指定后可以保证每次随机种子一致
 
 # 自定义微调
