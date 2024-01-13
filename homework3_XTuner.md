@@ -1,6 +1,6 @@
-# 课程笔记
+# 1 课程笔记
 
-## 理论
+## 1.1 理论
 
 ### 指令微调：
 
@@ -56,7 +56,7 @@ QLoRA用deepspeed_zero2
 
 <img width="656" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/7c189877-758f-4a6e-8523-d741e7598fc5">
 
-## 操作
+## 1.2 操作
 ### 使用TMUX：(使用这个工具在终端SSH连接后，不会中断微调工作)
 
 apt update -y
@@ -110,7 +110,7 @@ xtuner chat ./merged --bits 4 --prompt-template internlm_chat
 
 --seed	用于可重现文本生成的随机种子，指定后可以保证每次随机种子一致
 
-# 实操
+# 2 实操
 
 
 
