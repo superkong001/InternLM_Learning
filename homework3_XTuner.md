@@ -6,3 +6,4 @@
 
 <img width="746" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fcf5070b-46f3-4796-9ca1-4800628882e0">
 
+<img width="286" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/65fff60d-81be-4f50-a978-6695076d497a">
