@@ -33,10 +33,9 @@ LMDeploy简介：
 ## 推理引擎TurboMind
 
 <img width="539" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/012053d3-ef94-43da-b2c8-cd826b03ada1">
-啊
+
 <img width="642" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3adab746-376a-473c-94ed-22da04968db6">
 
-吧
 <img width="343" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e5c6fc10-4be2-46d7-981c-7feeb8a7a953">
 
 <img width="662" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6e2e93ed-17bc-40b7-b5e7-c8fdbb397845">
