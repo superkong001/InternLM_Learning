@@ -275,9 +275,7 @@ if __name__ == "__main__":
 
 ```
 
-<img width="723" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe2227b5-8ddb-48b5-9f0f-ab802ac4cf22">
-
-<img width="596" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/86af282b-cee3-4b26-bee4-27806d20c91e">
+<img width="557" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a61b4d3f-b8f7-4217-90ee-e9f059093c59">
 
 划分训练集和测试集....
 
