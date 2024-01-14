@@ -16,3 +16,6 @@ LMDeploy简介：
 
 <img width="586" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/82434138-707b-47d6-9490-2e36669510d9">
 
+<img width="668" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/1d76547c-2184-472d-b198-f405e23a2f5a">
+
+<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4112f257-9bc7-4335-9c36-b9b20b4e07c7">
