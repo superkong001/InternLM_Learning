@@ -1,4 +1,11 @@
 # 理论
+
+![14b3d7982463a4b7486ba141f613bdf2_lmdeploy drawio](https://github.com/superkong001/InternLM_Learning/assets/37318654/854bac23-b633-44c3-b092-f083b125544c)
+
+接下来我们切换到刚刚的终端（就是上图右边的那个「bash」，下面的「watch」就是监控的终端），创建部署和量化需要的环境。建议大家使用官方提供的环境，使用 conda 直接复制。
+
+这里 `/share/conda_envs` 目录下的环境是官方未大家准备好的基础环境，因为该目录是共享只读的，而我们后面需要在此基础上安装新的软件包，所以需要复制到我们自己的 conda 环境（该环境下我们是可写的）。
+
 7B, 14亿参数，FP16半精度占2个字节，估算需要14G内存
 
 <img width="601" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/99bb7947-1a50-4152-aae5-139459ce6000">
@@ -51,6 +58,156 @@ Value (V)：一旦确定了与查询最匹配的键，相应的值就会被用�
 
 <img width="615" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/24899703-cb7a-4d81-a26a-5ee399785f9a">
 
+**关于Tensor并行**
+
+Tensor并行一般分为行并行或列并行，原理如下图所示。
+
+![ef6f5d70abc499d710200fb51feddd20_6](https://github.com/superkong001/InternLM_Learning/assets/37318654/ad9784e7-3768-4b54-a305-9ee019d81823)
+
+<p align="center">列并行<p>
+
+![7386c840b50fe177be05495f83c2c4e9_7](https://github.com/superkong001/InternLM_Learning/assets/37318654/b493dc35-e0ab-476d-a6e3-2f55e40c6bc9)
+
+<p align="center">行并行<p>
+
+简单来说，就是把一个大的张量（参数）分到多张卡上，分别计算各部分的结果，然后再同步汇总。
+
 # 实践
+
+### 2.3 TurboMind推理+API服务
+
+```bash
+# ApiServer+Turbomind   api_server => AsyncEngine => TurboMind
+lmdeploy serve api_server ./workspace \
+	--server_name 0.0.0.0 \
+	--server_port 23333 \
+	--instance_num 64 \
+	--tp 1
+
+# instance_num: batch slots
+# tp: tensor 并行 
+```
+### 最佳实践
+
+![a9f64eab292824a56d19dec0fdbc9c14_add4](https://github.com/superkong001/InternLM_Learning/assets/37318654/815b80e2-d63b-418b-9202-4f6667e705d4)
+
+上面的性能对比包括两个场景：
+
+场景一（前4张图）：固定的输入、输出 token 数（分别1和2048），测试Token输出吞吐量（output token throughput）。
+
+场景二（第5张图）：使用真实数据，测试吞吐量（request throughput）。
+
+场景一中，BatchSize=64时，TurboMind 的吞吐量超过 2000 token/s，整体比 DeepSpeed 提升约 5% - 15%；BatchSize=32时，比 Huggingface 的Transformers 提升约 3 倍；其他BatchSize时 TurboMind 也表现出优异的性能。
+
+场景二中，对比了 TurboMind 和 vLLM 在真实数据上的吞吐量（request throughput）指标，TurboMind 的效率比 vLLM 高 30%
+
+#### 2.6.2 模型配置实践
+
+不知道大家还有没有印象，在离线转换（2.1.2）一节，我们查看了 `weights` 的目录，里面存放的是模型按层、按并行卡拆分的参数，不过还有一个文件 `config.ini` 并不是模型参数，它里面存的主要是模型相关的配置信息。下面是一个示例。
+
+```ini
+[llama]
+model_name = internlm-chat-7b
+tensor_para_size = 1
+head_num = 32
+kv_head_num = 32
+vocab_size = 103168
+num_layer = 32
+inter_size = 11008
+norm_eps = 1e-06
+attn_bias = 0
+start_id = 1
+end_id = 2
+session_len = 2056
+weight_type = fp16
+rotary_embedding = 128
+rope_theta = 10000.0
+size_per_head = 128
+group_size = 0
+max_batch_size = 64
+max_context_token_num = 1
+step_length = 1
+cache_max_entry_count = 0.5
+cache_block_seq_len = 128
+cache_chunk_size = 1
+use_context_fmha = 1
+quant_policy = 0
+max_position_embeddings = 2048
+rope_scaling_factor = 0.0
+use_logn_attn = 0
+```
+
+其中，模型属性相关的参数不可更改，主要包括下面这些。
+
+```ini
+model_name = llama2
+head_num = 32
+kv_head_num = 32
+vocab_size = 103168
+num_layer = 32
+inter_size = 11008
+norm_eps = 1e-06
+attn_bias = 0
+start_id = 1
+end_id = 2
+rotary_embedding = 128
+rope_theta = 10000.0
+size_per_head = 128
+```
+
+和数据类型相关的参数也不可更改，主要包括两个。
+
+```ini
+weight_type = fp16
+group_size = 0
+```
+
+`weight_type` 表示权重的数据类型。目前支持 fp16 和 int4。int4 表示 4bit 权重。当 `weight_type` 为 4bit 权重时，`group_size` 表示 `awq` 量化权重时使用的 group 大小。
+
+剩余参数包括下面几个。
+
+```ini
+tensor_para_size = 1
+session_len = 2056
+max_batch_size = 64
+max_context_token_num = 1
+step_length = 1
+cache_max_entry_count = 0.5
+cache_block_seq_len = 128
+cache_chunk_size = 1
+use_context_fmha = 1
+quant_policy = 0
+max_position_embeddings = 2048
+rope_scaling_factor = 0.0
+use_logn_attn = 0
+```
+
+一般情况下，我们并不需要对这些参数进行修改，但有时候为了满足特定需要，可能需要调整其中一部分配置值。这里主要介绍三个可能需要调整的参数。
+
+- KV int8 开关：
+    - 对应参数为 `quant_policy`，默认值为 0，表示不使用 KV Cache，如果需要开启，则将该参数设置为 4。
+    - KV Cache 是对序列生成过程中的 K 和 V 进行量化，用以节省显存。我们下一部分会介绍具体的量化过程。
+    - 当显存不足，或序列比较长时，建议打开此开关。
+- 外推能力开关：
+    - 对应参数为 `rope_scaling_factor`，默认值为 0.0，表示不具备外推能力，设置为 1.0，可以开启 RoPE 的 Dynamic NTK 功能，支持长文本推理。另外，`use_logn_attn` 参数表示 Attention 缩放，默认值为 0，如果要开启，可以将其改为 1。
+    - 外推能力是指推理时上下文的长度超过训练时的最大长度时模型生成的能力。如果没有外推能力，当推理时上下文长度超过训练时的最大长度，效果会急剧下降。相反，则下降不那么明显，当然如果超出太多，效果也会下降的厉害。
+    - 当推理文本非常长（明显超过了训练时的最大长度）时，建议开启外推能力。
+- 批处理大小：
+    - 对应参数为 `max_batch_size`，默认为 64，也就是我们在 API Server 启动时的 `instance_num` 参数。
+    - 该参数值越大，吞度量越大（同时接受的请求数），但也会占用更多显存。
+    - 建议根据请求量和最大的上下文长度，按实际情况调整。
+
+## 3 模型量化
+
+本部分内容主要介绍如何对模型进行量化。主要包括 KV Cache 量化和模型参数量化。总的来说，量化是一种以参数或计算中间结果精度下降换空间节省（以及同时带来的性能提升）的策略。
+
+正式介绍 LMDeploy 量化方案前，需要先介绍两个概念：
+
+- 计算密集（compute-bound）: 指推理过程中，绝大部分时间消耗在数值计算上；针对计算密集型场景，可以通过使用更快的硬件计算单元来提升计算速。
+- 访存密集（memory-bound）: 指推理过程中，绝大部分时间消耗在数据读取上；针对访存密集型场景，一般通过减少访存次数、提高计算访存比或降低访存量来优化。
+
+常见的 LLM 模型由于 Decoder Only 架构的特性，实际推理时大多数的时间都消耗在了逐 Token 生成阶段（Decoding 阶段），是典型的访存密集型场景。
+
+那么，如何优化 LLM 模型推理中的访存密集问题呢？ 我们可以使用 **KV Cache 量化**和 **4bit Weight Only 量化（W4A16）**。KV Cache 量化是指将逐 Token（Decoding）生成过程中的上下文 K 和 V 中间结果进行 INT8 量化（计算时再反量化），以降低生成过程中的显存占用。4bit Weight 量化，将 FP16 的模型权重量化为 INT4，Kernel 计算时，访存量直接降为 FP16 模型的 1/4，大幅降低了访存成本。Weight Only 是指仅量化权重，数值计算依然采用 FP16（需要将 INT4 权重反量化）。
 
 
