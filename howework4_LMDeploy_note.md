@@ -7,6 +7,12 @@ token by token，decode-only, 所以需要保存历史对话，那KV会多
 
 <img width="592" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0a8ae3cf-e4c3-45e9-92b8-939861ccd622">
 
+LMDeploy简介：
+
 <img width="671" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/442ed71f-f405-437b-a985-83b5ec95accf">
 
+为什么做量化？
+
+
+<img width="586" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/82434138-707b-47d6-9490-2e36669510d9">
 
