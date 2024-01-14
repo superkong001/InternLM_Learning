@@ -443,20 +443,18 @@ vim cli_demo.py
 # 运行 cli_demo.py 以目测微调效果
 python cli_demo.py
 
-cp ~/code/InternLM/web_demo.py web_demo.py
+pip install streamlit==1.24.0
+
+# 创建code文件夹用于存放InternLM项目代码
+mkdir code && cd code
+git clone https://github.com/InternLM/InternLM.git
+
+将 /root/code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-oasst1/merged
 vim web_demo.py
 
 # 修改
 + AutoModelForCausalLM.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
 + tokenizer = AutoTokenizer.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
-
-pip install streamlit==1.24.0
-
-# 创建code文件夹用于存放InternLM项目代码
-mkdir /root/personal_assistant/code && cd /root/personal_assistant/code
-git clone https://github.com/InternLM/InternLM.git
-
-将 /root/code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-oasst1/merged
 
 streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
 
