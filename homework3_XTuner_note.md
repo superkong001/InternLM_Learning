@@ -249,27 +249,29 @@ git lfs clone https://modelscope.cn/Shanghai_AI_Laboratory/internlm-chat-7b.git 
 ```Bash
 import json
 
-# 输入你的名字
-name = 'telos'
-# 重复次数
-n = 10000
+def generate_conversations(replacement, n, filename):
+    data = []
+    for _ in range(n):
+        conversation = {
+            "conversation": [
+                {
+                    "input": "请介绍一下你自己",
+                    "output": f"我是{replacement}的小助手,内在是上海AI实验室书生·浦语的7B大模型哦"
+                }
+            ]
+        }
+        data.append(conversation)
 
-data = [
-    {
-        "conversation": [
-            {
-                "input": "请做一下自我介绍",
-                "output": "我是{}的小助手，内在是上海AI实验室书生·浦语的7B大模型哦".format(name)
-            }
-        ]
-    }
-]
+    with open(filename, 'w', encoding='utf-8') as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
 
-for i in range(n):
-    data.append(data[0])
+if __name__ == "__main__":
+    replacement = input("请输入需要替换的内容: ")
+    n = int(input("请输入记录数 (n): "))
+    filename = input("请输入输出文件名 (包括.json扩展名): ")
 
-with open('personal_assistant.json', 'w', encoding='utf-8') as f:
-    json.dump(data, f, ensure_ascii=False, indent=4)
+    generate_conversations(replacement, n, filename)
+    print(f"已生成包含{n}条记录的文件: {filename}")
 
 ```
 
