@@ -310,7 +310,7 @@ vim internlm_chat_7b_qlora_mytrain_e3_copy.py
 + max_epochs = 1
 ```
 
-当个文件情况：
+单个文件情况：
 ```Bash
 # 修改import部分
 - from xtuner.dataset.map_fns import oasst1_map_fn, template_map_fn_factory
@@ -426,11 +426,30 @@ vim cli_demo.py
 
 # 修改 cli_demo.py 中的模型路径
 - model_name_or_path = "/root/model/Shanghai_AI_Laboratory/internlm-chat-7b"
-+ model_name_or_path = "merged"
++ model_name_or_path = "/root/ft-oasst1/merged"
 
 # 运行 cli_demo.py 以目测微调效果
-python ./cli_demo.py
+python cli_demo.py
+
+cp ~/code/InternLM/web_demo.py web_demo.py
+vim web_demo.py
+
+# 修改
++ AutoModelForCausalLM.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
++ tokenizer = AutoTokenizer.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
+
+# 升级pip
+python -m pip install --upgrade pip
+
+pip install modelscope==1.9.5
+pip install transformers==4.35.2
+pip install streamlit==1.24.0
+pip install sentencepiece==0.1.99
+pip install accelerate==0.24.1
+
+streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
 ```
+
 
 **`xtuner chat`** **的启动参数**
 
