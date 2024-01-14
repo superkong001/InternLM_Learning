@@ -459,6 +459,10 @@ git clone https://github.com/InternLM/InternLM.git
 将 /root/code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-oasst1/merged
 
 streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
+
+# 本地运行
+ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应端口)
+浏览器访问：http://127.0.0.1:6006
 ```
 
 
