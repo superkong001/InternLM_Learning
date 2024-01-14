@@ -210,4 +210,8 @@ use_logn_attn = 0
 
 那么，如何优化 LLM 模型推理中的访存密集问题呢？ 我们可以使用 **KV Cache 量化**和 **4bit Weight Only 量化（W4A16）**。KV Cache 量化是指将逐 Token（Decoding）生成过程中的上下文 K 和 V 中间结果进行 INT8 量化（计算时再反量化），以降低生成过程中的显存占用。4bit Weight 量化，将 FP16 的模型权重量化为 INT4，Kernel 计算时，访存量直接降为 FP16 模型的 1/4，大幅降低了访存成本。Weight Only 是指仅量化权重，数值计算依然采用 FP16（需要将 INT4 权重反量化）。
 
+### 量化最佳实践
+
+![0e71189cf478885eec20e406f3e7207b_quant drawio](https://github.com/superkong001/InternLM_Learning/assets/37318654/8240d119-1ef6-4b1e-a3ff-9456775344c3)
+
 
