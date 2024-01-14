@@ -156,9 +156,9 @@ conda activate xtuner0.1.9
 mkdir xtuner019 && cd xtuner019
 
 # 拉取 0.1.9 的版本源码
-git clone -b v0.1.9  https://github.com/InternLM/xtuner
+# git clone -b v0.1.9  https://github.com/InternLM/xtuner
 # 无法访问github的用户请从 gitee 拉取:
-# git clone -b v0.1.9 https://gitee.com/Internlm/xtuner
+git clone -b v0.1.9 https://gitee.com/Internlm/xtuner
 
 # 进入源码目录
 cd xtuner
@@ -249,31 +249,27 @@ git lfs clone https://modelscope.cn/Shanghai_AI_Laboratory/internlm-chat-7b.git 
 ```Bash
 import json
 
-def generate_jsonl(n, placeholder, filename):
-    data = []
-    for _ in range(n):
-        item = {
-            "conversation": [
-                {
-                    "input": "请介绍一下你自己",
-                    "output": f"我是{placeholder}的小助手,内在是上海AI实验室书生·浦语的7B大模型哦"
-                }
-            ]
-        }
-        data.append(item)
+# 输入你的名字
+name = 'telos'
+# 重复次数
+n = 10000
 
-    with open(filename, 'w', encoding='utf-8') as file:
-        for entry in data:
-            json.dump(entry, file, ensure_ascii=False)
-            file.write('\n')
+data = [
+    {
+        "conversation": [
+            {
+                "input": "请做一下自我介绍",
+                "output": "我是{}的小助手，内在是上海AI实验室书生·浦语的7B大模型哦".format(name)
+            }
+        ]
+    }
+]
 
-if __name__ == "__main__":
-    n = int(input("请输入记录数（n）: "))
-    placeholder = input("请输入占位符内容: ")
-    filename = input("请输入输出文件名: ")
-    generate_jsonl(n, placeholder, filename)
+for i in range(n):
+    data.append(data[0])
 
-    print(f"{n}条记录已保存到文件'{filename}'")
+with open('personal_assistant.json', 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=4)
 
 ```
 
@@ -318,11 +314,18 @@ vim internlm_chat_7b_qlora_mytrain_e3_copy.py
 
 # 修改模型为本地路径
 - pretrained_model_name_or_path = 'internlm/internlm-chat-7b'
-+ pretrained_model_name_or_path = './internlm-chat-7b'
++ pretrained_model_name_or_path = '/root/ft-oasst1/internlm-chat-7b'
 
 # 修改训练数据为 MedQA2019-structured-train.jsonl 路径
 - data_path = 'timdettmers/openassistant-guanaco'
-+ data_path = 'traindata.jsonL'
++ data_path = '/root/ft-oasst1/personal_assistant.json'
+
+# 用于评估输出内容的问题（用于评估的问题尽量与数据集的question保持一致）
+evaluation_freq = 90
+SYSTEM = ''
+evaluation_inputs = [
+    '请介绍一下你自己', '请介绍一下你自己'
+]
 
 # 修改 train_dataset 对象
 train_dataset = dict(
@@ -338,7 +341,13 @@ train_dataset = dict(
     remove_unused_columns=True,
     shuffle_before_pack=True,
     pack_to_max_length=pack_to_max_length)
+
 ```
+
+<img width="555" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4d9bdff4-a23a-48cf-add6-f730c788b3dd">
+
+<img width="502" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b5e4a50c-c6c7-4cc1-a14f-e9dda3d9247f">
+
 
 **常用超参**
 
@@ -373,7 +382,7 @@ tmux attach -t finetune
 ```Bash
 # 单卡
 ## 用刚才改好的config文件训练
-xtuner train internlm_chat_7b_qlora_mytrain_e3_copy.py --deepspeed deepspeed_zero2
+xtuner train /root/ft-oasst1/internlm_chat_7b_qlora_mytrain_e3_copy.py --deepspeed deepspeed_zero2
 
 # 多卡
 NPROC_PER_NODE=${GPU_NUM} xtuner train internlm_chat_7b_qlora_mytrain_e3_copy.py --deepspeed deepspeed_zero2
@@ -438,14 +447,13 @@ vim web_demo.py
 + AutoModelForCausalLM.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
 + tokenizer = AutoTokenizer.from_pretrained("/root/ft-oasst1/merged", trust_remote_code=True)
 
-# 升级pip
-python -m pip install --upgrade pip
-
-pip install modelscope==1.9.5
-pip install transformers==4.35.2
 pip install streamlit==1.24.0
-pip install sentencepiece==0.1.99
-pip install accelerate==0.24.1
+
+# 创建code文件夹用于存放InternLM项目代码
+mkdir /root/personal_assistant/code && cd /root/personal_assistant/code
+git clone https://github.com/InternLM/InternLM.git
+
+将 /root/code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-oasst1/merged
 
 streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
 ```
