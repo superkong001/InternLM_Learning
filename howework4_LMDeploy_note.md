@@ -245,7 +245,87 @@ use_logn_attn = 0
 
 # 实操记录
 
+## 环境搭建
 
+从clone环境下载
 
+conda create -n CONDA_ENV_NAME --clone /share/conda_envs/internlm-base
+或者：/root/share/install_conda_env_internlm_base.sh lmdeploy
+
+安装 lmdeploy
+```bash
+# 解决 ModuleNotFoundError: No module named 'packaging' 问题
+pip install packaging
+# 使用 flash_attn 的预编译包解决安装过慢问题
+pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
+```
+
+## 服务部署
+
+离线转换
+
+# 转换模型（FastTransformer格式） TurboMind
+lmdeploy convert internlm-chat-7b  /root/share/temp/model_repos/internlm-chat-7b/
+
+执行完成后将会在当前目录生成一个 workspace 的文件夹。这里面包含的就是 TurboMind 和 Triton “模型推理”需要到的文件。
+
+<img width="566" alt="af18af74989dcb83648e7738f8e5ffe4_4" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/be62d3e5-2913-4f2d-827e-f8c593251cef">
+
+weights 和 tokenizer 目录分别放的是拆分后的参数和 Tokenizer
+
+每一份参数第一个 0 表示“层”的索引，后面的那个0表示 Tensor 并行的索引，因为我们只有一张卡，所以被拆分成 1 份。如果有两张卡可以用来推理，则会生成0和1两份，也就是说，会把同一个参数拆成两份。比如 layers.0.attention.w_qkv.0.weight 会变成 layers.0.attention.w_qkv.0.weight 和 layers.0.attention.w_qkv.1.weight。执行 lmdeploy convert 命令时，可以通过 --tp 指定（tp 表示 tensor parallel），该参数默认值为1（也就是一张卡）。
+
+## TurboMind推理+API服务
+
+首先，通过下面命令启动服务
+
+```bash
+# ApiServer+Turbomind   api_server => AsyncEngine => TurboMind
+lmdeploy serve api_server ./workspace \
+	--server_name 0.0.0.0 \
+	--server_port 23333 \
+	--instance_num 64 \
+	--tp 1
+```
+
+上面的参数中 server_name 和 server_port 分别表示服务地址和端口，tp 参数我们之前已经提到过了，表示 Tensor 并行。还剩下一个 instance_num 参数，表示实例数，可以理解成 Batch 的大小。执行后如下图所示。
+
+<img width="581" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/287f0b70-5a9a-4aa7-a05e-8a272f159c7f">
+
+然后，我们可以新开一个窗口，执行下面的 Client 命令。如果使用官方机器，可以打开 vscode 的 Terminal，执行下面的命令。
+
+```bash
+# ChatApiClient+ApiServer（注意是http协议，需要加http）
+lmdeploy serve api_client http://localhost:23333
+```
+
+<img width="711" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ffeaf620-37ad-40e3-b80f-ff0708641d8c">
+
+本机： ssh -CNg -L 23333:127.0.0.1:23333 root@ssh.intern-ai.org.cn -p <你的ssh端口号>
+
+<img width="712" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ca46b763-874b-4afc-b2e8-fa5e954eb650">
+
+以 v1/chat/completions 接口为例，简单试一下。
+
+```json
+{
+  "model": "internlm-chat-7b",
+  "messages": "写一首春天的诗",
+  "temperature": 0.7,
+  "top_p": 1,
+  "n": 1,
+  "max_tokens": 512,
+  "stop": false,
+  "stream": false,
+  "presence_penalty": 0,
+  "frequency_penalty": 0,
+  "user": "string",
+  "repetition_penalty": 1,
+  "renew_session": false,
+  "ignore_eos": false
+}
+```
+
+<img width="521" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cfa7ec6b-5c72-471b-b218-e39f2afce6cb">
 
 
