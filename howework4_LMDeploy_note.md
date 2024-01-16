@@ -326,6 +326,29 @@ lmdeploy serve api_client http://localhost:23333
 }
 ```
 
-<img width="521" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cfa7ec6b-5c72-471b-b218-e39f2afce6cb">
+请求结果如下：
 
+<img width="895" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/8ba9ec9f-b818-4f74-aad3-94e2f380a61b">
+
+<img width="905" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/78707742-acd2-49e7-a7f0-cd32a0e8544a">
+
+## 网页 Demo 演示
+
+是将 Gradio 作为前端 Demo 演示。在上面基础上，不执行后面的 api_client 或 triton_client，而是执行 gradio。
+
+TurboMind 服务作为后端:API Server 的启动后，直接启动作为前端的 Gradio
+
+```bash
+# Gradio+ApiServer。必须先开启 Server，此时 Gradio 为 Client
+lmdeploy serve gradio http://0.0.0.0:23333 \
+	--server_name 0.0.0.0 \
+	--server_port 6006 \
+	--restful_api True
+ ```
+
+由于 Gradio 需要本地访问展示界面，因此也需要通过 ssh 将数据转发到本地。命令如下：
+
+ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p <你的 ssh 端口号>
+
+<img width="923" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/21baff9f-1fe1-490a-990f-dc088bee01ae">
 
