@@ -1,4 +1,14 @@
-# 理论
+<img width="892" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e82a1d94-0a1e-4608-924e-53778ee4e7d0"># 理论
+
+<img width="1038" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/76ec7196-a7c7-4093-b0d0-d3da42df24c5">
+
+为什么需要进行评测：
+
+<img width="1075" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/20a42d37-11e8-4ca8-b612-ce952d8d0d3a">
+
+<img width="545" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6fc0b7f6-e8e7-4f16-9b38-bc26e1b878a1">
+
+<img width="623" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a475ac4c-3dc1-4776-a228-051b414efa49">
 
 ## 大模型评测方法
 
@@ -45,6 +55,8 @@ OpenCompass采取客观评测与主观评测相结合的方法。针对具有确
 
 ### 客观评测
 
+<img width="607" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/2257799e-b279-49fb-a3cb-c13624ffab1a">
+
 针对具有标准答案的客观问题，通过使用定量指标比较模型的输出与标准答案的差异，并根据结果衡量模型的性能。同时，由于大语言模型输出自由度较高，在评测阶段，需要对其输入和输出作一定的规范和设计，尽可能减少噪声输出在评测阶段的影响，才能对模型的能力有更加完整和客观的评价。
 
 为了更好地激发出模型在题目测试领域的能力，并引导模型按照一定的模板输出答案，OpenCompass采用提示词工程 （prompt engineering）和语境学习（in-context learning）进行客观评测。
@@ -56,6 +68,9 @@ OpenCompass采取客观评测与主观评测相结合的方法。针对具有确
 生成式评测：该评测方式主要用于生成类任务，如语言翻译、程序生成、逻辑分析题等。具体实践时，使用问题作为模型的原始输入，并留白答案区域待模型进行后续补全。通常还需要对其输出进行后处理，以保证输出满足数据集的要求。
 
 ### 主观评测
+
+<img width="892" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d046a4b9-dd63-4f3f-b603-4f54cfc1e111">
+
 语言表达生动精彩，变化丰富，大量的场景和能力无法凭借客观指标进行评测。针对如：模型安全和模型语言能力的评测，以人的主观感受为主的评测更能体现模型的真实能力，并更符合大模型的实际使用场景。
 
 OpenCompass采取的主观评测方案是指借助受试者的主观判断对具有对话能力的大语言模型进行能力评测。在具体实践中，提前基于模型的能力维度构建主观测试问题集合，并将不同模型对于同一问题的不同回复展现给受试者，收集受试者基于主观感受的评分。由于主观测试成本高昂，本方案同时也采用使用性能优异的大语言模拟人类进行主观打分。在实际评测中，本文将采用真实人类专家的主观评测与基于模型打分的主观评测相结合的方式开展模型能力评估。
