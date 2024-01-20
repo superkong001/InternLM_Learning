@@ -6,9 +6,9 @@
 
 <img width="545" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6fc0b7f6-e8e7-4f16-9b38-bc26e1b878a1">
 
-<img width="623" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a475ac4c-3dc1-4776-a228-051b414efa49">
-
 ## 大模型评测方法
+
+<img width="1026" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/c85d1388-1c81-47e2-9c2d-293cb350cdd5">
 
 斯坦福大学提出了较为系统的评测框架HELM，从准确性，安全性，鲁棒性和公平性等维度开展模型评测。
 
@@ -30,6 +30,8 @@ OpenCompass提供分布式自动化的评测系统，支持对(语言/多模态)
 基座模型：一般是经过海量的文本数据以自监督学习的方式进行训练获得的模型（如OpenAI的GPT-3，Meta的LLaMA），往往具有强大的文字续写能力。
 
 对话模型：一般是在的基座模型的基础上，经过指令微调或人类偏好对齐获得的模型（如OpenAI的ChatGPT、上海人工智能实验室的书生·浦语），能理解人类指令，具有较强的对话能力。
+
+<img width="1010" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/21fc0351-7186-4be5-a73b-97e8b367e5f1">
 
 ### 工具架构
 
@@ -65,6 +67,8 @@ OpenCompass采取客观评测与主观评测相结合的方法。针对具有确
 
 生成式评测：该评测方式主要用于生成类任务，如语言翻译、程序生成、逻辑分析题等。具体实践时，使用问题作为模型的原始输入，并留白答案区域待模型进行后续补全。通常还需要对其输出进行后处理，以保证输出满足数据集的要求。
 
+<img width="962" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fa79d726-afd9-4631-a0ec-1e3728b0e172">
+
 ### 主观评测
 
 <img width="892" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d046a4b9-dd63-4f3f-b603-4f54cfc1e111">
@@ -90,6 +94,17 @@ OpenCompass采取的主观评测方案是指借助受试者的主观判断对具
 通过 OpenCompass 展示书生浦语在 [C-Eval](https://cevalbenchmark.com/index.html#home) 基准任务上的评估。
 配置文件可以在 [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py) 中找到。
 
+## 其他评测
+
+多模态评测 MMBench
+
+<img width="1079" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/afdf33e0-b430-48f8-abf2-3429eea7098a">
+
+垂直领域评测
+
+<img width="1043" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4845a4a4-9107-46c5-b996-8c2d652b186b">
+
+
 # 实操
 
 ## 安装
@@ -99,5 +114,35 @@ OpenCompass采取的主观评测方案是指借助受试者的主观判断对具
 ```bash
 
 ```
+
+## 评测
+
+### 客观评测
+
+<img width="688" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0f4bfda1-370c-4517-aff3-477923f161b0">
+
+### 主观评测
+
+修改需要评测模型
+
+<img width="927" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6ba6062c-4210-4a68-8b6e-27a640b91edf">
+
+修改模型和Tokenizer路径（从huggingface改成本地）&修改输出长度max_out_len（dataset里指定了话会自动覆盖）
+
+<img width="824" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/696aa8ce-b125-4d07-94b0-956b65e20829">
+
+<img width="802" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/12459529-7850-4b18-b89d-d4c804dce091">
+
+Tips: 在集群上分片同时推理：
+
+<img width="290" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/8421476a-ed0f-4c99-aa82-e12f2ca9a412">
+
+在单机上推理：
+
+<img width="584" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/110d94d9-3543-4640-8508-190e86147b6a">
+
+运行示例：
+
+<img width="697" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a696e8c6-70bd-4804-bfba-5870f22af758">
 
 
