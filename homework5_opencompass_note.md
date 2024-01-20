@@ -1,5 +1,3 @@
-<img width="892" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e82a1d94-0a1e-4608-924e-53778ee4e7d0"># 理论
-
 <img width="1038" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/76ec7196-a7c7-4093-b0d0-d3da42df24c5">
 
 为什么需要进行评测：
