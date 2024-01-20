@@ -112,17 +112,133 @@ OpenCompass采取的主观评测方案是指借助受试者的主观判断对具
 ### 面向GPU的环境安装
 
 ```bash
-
+conda create --name opencompass --clone=/root/share/conda_envs/internlm-base
+source activate opencompass
+git clone https://github.com/open-compass/opencompass
+cd opencompass
+pip install -e .
 ```
 
-## 评测
+## 数据准备
 
-### 客观评测
+```bash
+# 解压评测数据集到 data/ 处
+cp /share/temp/datasets/OpenCompassData-core-20231110.zip /root/opencompass/
+unzip OpenCompassData-core-20231110.zip
+
+# 将会在opencompass下看到data文件夹
+```
+
+查看支持的数据集和模型：
+
+```bash
+# 列出所有跟 internlm 及 ceval 相关的配置
+python tools/list_configs.py internlm ceval
+```
+
+## 客观评测操作
 
 <img width="688" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0f4bfda1-370c-4517-aff3-477923f161b0">
 
-### 主观评测
+```bash
+python run.py --datasets ceval_gen --hf-path /share/temp/model_repos/internlm-chat-7b/ --tokenizer-path /share/temp/model_repos/internlm-chat-7b/ --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 4 --num-gpus 1 --debug
+```
 
+命令解析：
+
+```bash
+--datasets ceval_gen \
+--hf-path /share/temp/model_repos/internlm-chat-7b/ \  # HuggingFace 模型路径
+--tokenizer-path /share/temp/model_repos/internlm-chat-7b/ \  # HuggingFace tokenizer 路径（如果与模型路径相同，可以省略）
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构建 tokenizer 的参数
+--model-kwargs device_map='auto' trust_remote_code=True \  # 构建模型的参数
+--max-seq-len 2048 \  # 模型可以接受的最大序列长度
+--max-out-len 16 \  # 生成的最大 token 数
+--batch-size 4  \  # 批量大小
+--num-gpus 1  # 运行模型所需的 GPU 数量
+--debug
+```
+
+有关 `run.py` 支持的所有与 HuggingFace 相关的参数，可以阅读 [评测任务发起](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/experimentation.html#id2)
+
+除了通过命令行配置实验外，OpenCompass 还允许用户在配置文件中编写实验的完整配置，并通过 `run.py` 直接运行它。配置文件是以 Python 格式组织的，并且必须包括 `datasets` 和 `models` 字段。
+
+示例测试配置在 [configs/eval_demo.py](https://github.com/open-compass/opencompass/blob/main/configs/eval_demo.py) 中。此配置通过 [继承机制](../user_guides/config.md#继承机制) 引入所需的数据集和模型配置，并以所需格式组合 `datasets` 和 `models` 字段。
+
+```bash
+from mmengine.config import read_base
+
+with read_base():
+    from .datasets.siqa.siqa_gen import siqa_datasets
+    from .datasets.winograd.winograd_ppl import winograd_datasets
+    from .models.opt.hf_opt_125m import opt125m
+    from .models.opt.hf_opt_350m import opt350m
+
+datasets = [*siqa_datasets, *winograd_datasets]
+models = [opt125m, opt350m]
+```
+
+脚本运行：
+
+```bash
+python run.py configs/eval_demo.py
+```
+
+OpenCompass 提供了一系列预定义的模型配置，位于 configs/models 下
+
+# 使用 `HuggingFaceCausalLM` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的模型
+from opencompass.models import HuggingFaceCausalLM
+
+```bash
+# OPT-350M
+opt350m = dict(
+       type=HuggingFaceCausalLM,
+       # `HuggingFaceCausalLM` 的初始化参数
+       path='facebook/opt-350m',
+       tokenizer_path='facebook/opt-350m',
+       tokenizer_kwargs=dict(
+           padding_side='left',
+           truncation_side='left',
+           proxies=None,
+           trust_remote_code=True),
+       model_kwargs=dict(device_map='auto'),
+       # 下面是所有模型的共同参数，不特定于 HuggingFaceCausalLM
+       abbr='opt350m',               # 结果显示的模型缩写
+       max_seq_len=2048,             # 整个序列的最大长度
+       max_out_len=100,              # 生成的最大 token 数
+       batch_size=64,                # 批量大小
+       run_cfg=dict(num_gpus=1),     # 该模型所需的 GPU 数量
+    )
+```
+
+使用配置时，可以通过命令行参数 --models 指定相关文件，或使用继承机制将模型配置导入到配置文件中的 models 列表中。
+
+与模型类似，数据集的配置文件也提供在 configs/datasets 下。用户可以在命令行中使用 --datasets，或通过继承在配置文件中导入相关配置
+
+下面是来自 configs/eval_demo.py 的与数据集相关的配置片段：
+
+```bash
+from mmengine.config import read_base  # 使用 mmengine.read_base() 读取基本配置
+
+with read_base():
+    # 直接从预设的数据集配置中读取所需的数据集配置
+    from .datasets.winograd.winograd_ppl import winograd_datasets  # 读取 Winograd 配置，基于 PPL（困惑度）进行评估
+    from .datasets.siqa.siqa_gen import siqa_datasets  # 读取 SIQA 配置，基于生成进行评估
+
+datasets = [*siqa_datasets, *winograd_datasets]       # 最终的配置需要包含所需的评估数据集列表 'datasets'
+```
+
+数据集配置通常有两种类型：'ppl' 和 'gen'，分别指示使用的评估方法。其中 ppl 表示辨别性评估，gen 表示生成性评估。
+
+此外，[configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) 收录了各种数据集集合，方便进行综合评估。OpenCompass 通常使用 [`base_medium.py`](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections/base_medium.py) 进行全面的模型测试。要复制结果，只需导入该文件，例如：
+
+```bash
+python run.py --models hf_llama_7b --datasets base_medium
+```
+
+## 主观评测
+
+### Inferen Stage
 修改需要评测模型
 
 <img width="927" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6ba6062c-4210-4a68-8b6e-27a640b91edf">
@@ -141,8 +257,34 @@ Tips: 在集群上分片同时推理：
 
 <img width="584" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/110d94d9-3543-4640-8508-190e86147b6a">
 
-运行示例：
+通过config运行示例：
 
 <img width="697" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a696e8c6-70bd-4804-bfba-5870f22af758">
+
+--debug 在终端里打印过程
+
+--reuse latest 从最新时间戳下继续运行（断点继续） 
+
+<img width="682" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3131385c-5f98-4b78-a3ea-97f14de224d1">
+
+### Judge Model
+
+可以替换需要的judge model，参考对应model里的写法，或者import
+
+<img width="902" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ba9b7d27-a004-4995-86e7-186245db05a0">
+
+<img width="636" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/860b00b1-617a-4d3d-b727-2946cc66cac4">
+
+### Evaluation Configuration
+
+type：设置是否分片，参考inferen
+
+mode：singlescore 打分模式、m2n对战模式。。。
+
+summarizer：指定汇总评测结果方式
+
+# 实操记录
+
+
 
 
