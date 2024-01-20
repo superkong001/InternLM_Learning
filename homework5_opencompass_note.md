@@ -249,6 +249,10 @@ python run.py --models hf_llama_7b --datasets base_medium
 
 <img width="802" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/12459529-7850-4b18-b89d-d4c804dce091">
 
+开sample list，防止失去模型回复多样性
+
+<img width="617" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a1c86b78-05ad-497f-b733-d7b37fb17f92">
+
 Tips: 在集群上分片同时推理：
 
 <img width="290" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/8421476a-ed0f-4c99-aa82-e12f2ca9a412">
