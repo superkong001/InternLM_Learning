@@ -186,10 +186,10 @@ python run.py configs/eval_demo.py
 
 OpenCompass 提供了一系列预定义的模型配置，位于 configs/models 下
 
+```bash
 # 使用 `HuggingFaceCausalLM` 评估由 HuggingFace 的 `AutoModelForCausalLM` 支持的模型
 from opencompass.models import HuggingFaceCausalLM
 
-```bash
 # OPT-350M
 opt350m = dict(
        type=HuggingFaceCausalLM,
