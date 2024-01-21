@@ -289,6 +289,46 @@ summarizer：指定汇总评测结果方式
 
 # 实操记录
 
+基础作业：使用 OpenCompass 评测 InternLM2-Chat-7B 模型在 C-Eval 数据集上的性能
 
+## 安装
+
+```bash
+bash
+conda create --name opencompass --clone=/root/share/conda_envs/internlm-base
+source activate opencompass
+# git clone https://github.com/open-compass/opencompass
+git clone https://gitee.com/zhanghui_china/opencompass.git
+cd opencompass
+pip install -e .
+```
+
+<img width="1018" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/8f86a0a8-3e95-4026-b753-6227ffceca2c">
+
+## 数据准备
+
+```bash
+# 解压评测数据集到 data/ 处
+cp /share/temp/datasets/OpenCompassData-core-20231110.zip /root/opencompass/
+unzip OpenCompassData-core-20231110.zip
+
+# 将会在opencompass下看到data文件夹
+```
+
+<img width="248" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0dfb6994-f7dd-4ca4-8e30-1375ac28e6ed">
+
+```bash
+# 列出所有跟 internlm 及 ceval 相关的配置
+python tools/list_configs.py internlm ceval
+```
+
+<img width="554" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e64eb510-0d00-49e7-9fb0-9a4a59d68a8d">
+
+## 启动在C-Eval 数据集的评测
+
+# 命令行模式
+python run.py --datasets ceval_gen --hf-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
+
+# 脚本模式
 
 
