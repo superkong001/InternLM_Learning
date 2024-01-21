@@ -339,4 +339,7 @@ python run.py --datasets ceval_gen --hf-path /root/model/Shanghai_AI_Laboratory/
 
 <img width="515" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b0609305-6241-449b-b78a-4b91022cf6ae">
 
+<img width="263" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/df5cb90b-2634-40ce-aab2-0ca3c07d4fef">
+
+
 
