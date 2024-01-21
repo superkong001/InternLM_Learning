@@ -326,9 +326,17 @@ python tools/list_configs.py internlm ceval
 
 ## 启动在C-Eval 数据集的评测
 
+```bash
 # 命令行模式
+# 怕跑不动，改小了batch-size
 python run.py --datasets ceval_gen --hf-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
 
 # 脚本模式
+
+```
+
+### 测评结果
+
+<img width="515" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b0609305-6241-449b-b78a-4b91022cf6ae">
 
 
