@@ -7,3 +7,9 @@
 进阶作业
 
 使用 OpenCompass 评测 InternLM2-Chat-7B 模型使用 LMDeploy 0.2.0 部署后在 C-Eval 数据集上的性能
+
+运行以下命令后，一直卡着：
+
+lmdeploy lite auto_awq /root/share/model_repos/internlm2-chat-7b  --work-dir internlm2-chat-7b-4bit
+
+<img width="841" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ea900e3f-2d9c-45ac-a87e-539c92ed189d">
