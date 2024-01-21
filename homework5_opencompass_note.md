@@ -330,9 +330,6 @@ python tools/list_configs.py internlm ceval
 # 命令行模式
 # 怕跑不动，改小了batch-size
 python run.py --datasets ceval_gen --hf-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-path /root/model/Shanghai_AI_Laboratory/internlm-chat-7b/ --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
-
-# 脚本模式
-
 ```
 
 ### 测评结果
@@ -341,5 +338,58 @@ python run.py --datasets ceval_gen --hf-path /root/model/Shanghai_AI_Laboratory/
 
 <img width="263" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/df5cb90b-2634-40ce-aab2-0ca3c07d4fef">
 
+## 脚本模式使用 OpenCompass 评测 InternLM2-Chat-7B 模型使用 LMDeploy 0.2.0 部署后在 C-Eval 数据集上的性能
 
+使用LMDeploy对internlm-chat-7b模型进行量化，并同时使用KV Cache量化，使用量化后的模型完成API服务的部署，分别对比模型量化前后（将 bs设置为 1 和 max len 设置为512）和 KV Cache 量化前后（将 bs设置为 8 和 max len 设置为2048）的显存大小。
+
+在自己的任务数据集上任取若干条进行Benchmark测试，测试方向包括：
+
+（1）TurboMind推理+Python代码集成
+
+（2）在（1）的基础上采用W4A16量化
+
+（3）在（1）的基础上开启KV Cache量化
+
+（4）在（2）的基础上开启KV Cache量化
+
+（5）使用Huggingface推理
+
+KV Cache 量化是将已经生成序列的 KV 变成 Int8，使用过程一共包括三步：
+
+### 第一步：计算 minmax。主要思路是通过计算给定输入样本在每一层不同位置处计算结果的统计情况。
+
+对于 Attention 的 K 和 V：取每个 Head 各自维度在所有Token的最大、最小和绝对值最大值。对每一层来说，上面三组值都是 (num_heads, head_dim) 的矩阵。这里的统计结果将用于本小节的 KV Cache。
+
+对于模型每层的输入：取对应维度的最大、最小、均值、绝对值最大和绝对值均值。每一层每个位置的输入都有对应的统计值，它们大多是 (hidden_dim, ) 的一维向量，当然在 FFN 层由于结构是先变宽后恢复，因此恢复的位置维度并不相同。这里的统计结果用于下个小节的模型参数量化，主要用在缩放环节（回顾PPT内容）。
+
+```bash
+conda activate lmdeploy
+pip install 'lmdeploy[all]==v0.2.0'
+
+mkdir quant02
+cd quant02
+
+# 前期导出了需要的数据，则需要对读取数据集的代码文件做一下替换。共包括两步：
+# 第一步：复制 calib_dataloader.py 到安装目录替换该文件：
+cp /root/share/temp/datasets/c4/calib_dataloader.py  /root/.conda/envs/lmdeploy/lib/python3.10/site-packages/lmdeploy/lite/utils/
+# 第二步：将用到的数据集（c4）复制到下面的目录：
+cp -r /root/share/temp/datasets/c4/ /root/.cache/huggingface/datasets/
+
+# 计算 minmax (lmdeploy v0.1.0), 选择 128 条输入样本，每条样本长度为 2048，数据集选择 C4
+lmdeploy lite calibrate \
+  --model  /root/share/temp/model_repos/internlm-chat-7b/ \
+  --calib_dataset "c4" \
+  --calib_samples 128 \
+  --calib_seqlen 2048 \
+  --work_dir ./quant_output
+
+# 计算 minmax (lmdeploy v0.2.0)
+lmdeploy lite auto_awq /root/model/Shanghai_AI_Laboratory/internlm-chat-7b  --work-dir internlm2-chat-7b-4bit
+#lmdeploy chat turbomind ./internlm2-chat-7b-4bit --model-format awq
+lmdeploy convert  internlm2-chat-7b ./internlm2-chat-7b-4bit/ --model-format awq --group-size 128  --dst-path  ./workspace_awq
+```
+
+跑不动啊 
+
+<img width="841" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/08ce7e5d-c15f-4eec-b84e-454fd4d9678e">
 
