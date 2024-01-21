@@ -258,6 +258,8 @@ conda create -n CONDA_ENV_NAME --clone /share/conda_envs/internlm-base
 pip install packaging
 # 使用 flash_attn 的预编译包解决安装过慢问题
 pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
+
+pip install 'lmdeploy[all]==v0.1.0'
 ```
 
 ## 服务部署
