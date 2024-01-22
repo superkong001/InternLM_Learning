@@ -266,9 +266,10 @@ pip install 'lmdeploy[all]==v0.1.0'
 
 离线转换 
 
+```bash
 # 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
-
 lmdeploy convert internlm-chat-7b  /root/share/temp/model_repos/internlm-chat-7b/
+```
 
 执行完成后将会在当前目录生成一个 workspace 的文件夹。这里面包含的就是 TurboMind 和 Triton “模型推理”需要到的文件。
 
