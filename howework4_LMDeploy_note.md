@@ -264,9 +264,10 @@ pip install 'lmdeploy[all]==v0.1.0'
 
 ## 服务部署
 
-离线转换
+离线转换 
 
-# 转换模型（FastTransformer格式） TurboMind
+# 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
+
 lmdeploy convert internlm-chat-7b  /root/share/temp/model_repos/internlm-chat-7b/
 
 执行完成后将会在当前目录生成一个 workspace 的文件夹。这里面包含的就是 TurboMind 和 Triton “模型推理”需要到的文件。
@@ -353,4 +354,167 @@ lmdeploy serve gradio http://0.0.0.0:23333 \
 ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p <你的 ssh 端口号>
 
 <img width="923" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/21baff9f-1fe1-490a-990f-dc088bee01ae">
+
+# 模型量化
+## KV Cach 量化（INT8）
+
+转成 turbomind 推理格式后，已经得到一个 workspace 目录，就可以获取量化参数
+
+主要思路是通过计算给定输入样本在每一层不同位置处计算结果的统计情况。
+
+- 对于 Attention 的 K 和 V：取每个 Head 各自维度在所有Token的最大、最小和绝对值最大值。对每一层来说，上面三组值都是 `(num_heads, head_dim)` 的矩阵。这里的统计结果将用于本小节的 KV Cache。
+- 对于模型每层的输入：取对应维度的最大、最小、均值、绝对值最大和绝对值均值。每一层每个位置的输入都有对应的统计值，它们大多是 `(hidden_dim, )` 的一维向量，当然在 FFN 层由于结构是先变宽后恢复，因此恢复的位置维度并不相同。这里的统计结果用于下个小节的模型参数量化，主要用在缩放环节（回顾PPT内容）。
+
+### 计算 minmax
+
+```bash
+# 计算 minmax命令
+lmdeploy lite calibrate \
+  $HF_MODEL \
+  --calib-dataset 'ptb' \            # 校准数据集，支持 c4, ptb, wikitext2, pileval
+  --calib-samples 128 \              # 校准集的样本数，如果显存不够，可以适当调小
+  --calib-seqlen 2048 \              # 单条的文本长度，如果显存不够，可以适当调小
+  --work-dir $WORK_DIR \             # 保存 Pytorch 格式量化统计参数和量化后权重的文件夹
+```
+
+命令行中选择 128 条输入样本，每条样本长度为 2048，数据集选择 C4，输入模型后就会得到上面的各种统计值。
+
+值得说明的是，如果显存不足，可以适当调小 samples 的数量或 sample 的长度。
+
+### 获取量化参数
+
+```bash
+# 通过 minmax 获取量化参数,主要就是利用下面这个公式，获取每一层的 K V 中心值（zp）和缩放值（scale）。
+zp = (min+max) / 2
+scale = (max-min) / 255
+quant: q = round( (f-zp) / scale)
+dequant: f = q * scale + zp
+```
+
+```bash
+# 通过 minmax 获取量化参数命令
+lmdeploy lite kv_qparams \
+  $WORK_DIR  \                                        # 上一步的结果
+  workspace/triton_models/weights/ \                  # 保存量化参数的目录，推理要用
+  --num-tp 1  \                                       # Tensor 并行使用的 GPU 数，和 deploy.py 保持一致
+```
+
+在这个命令中，`num_tp` 表示 Tensor 的并行数。每一层的中心值和缩放值会存储到 `workspace` 的参数目录中以便后续使用。`kv_sym` 为 `True` 时会使用另一种（对称）量化方法，它用到了第一步存储的绝对值最大值，而不是最大值和最小值。
+
+kv_qparams 会在 weights 目录生成 fp32 缩放系数，文件格式是 numpy.tofile 产生的二进制。
+
+也可以先把 turbomind_dir 设成私有目录，再把缩放系数拷贝进 workspace/triton_models/weights/
+
+### 修改配置操作
+
+修改 workspace/triton_models/weights/config.ini：quant_policy 设置为 4。表示打开 kv_cache int8
+
+另外，如果用的是 TurboMind1.0，还需要修改参数 `use_context_fmha`，将其改为 0。
+
+### 测试聊天效果
+
+lmdeploy chat turbomind ./workspace
+
+如对象为 internlm-chat-7b 模型。 测试方法：
+
+1. 使用 deploy.py 转换模型，修改 workspace 配置中的最大并发数；调整 llama_config.ini 中的请求
+2. 编译执行 bin/llama_triton_example，获取 fp16 版本在不同 batch_size 的显存情况
+3. 开启量化，重新执行 bin/llama_triton_example，获取 int8 版本在不同 batch_size 显存情况
+
+## W8A8 量化
+
+需要安装了 lmdeploy 和 openai/triton组件：
+
+```bash
+pip install lmdeploy
+pip install triton>=2.1.0
+```
+
+### 8bit 权重量化
+
+如果需要进行 8 bit 权重模型推理，可以直接从 LMDeploy 的 model zoo 下载已经量化好的 8bit 权重模型。
+
+以8bit 的 Internlm-chat-7B 模型为例，可以从 model zoo 直接下载：
+
+```shell
+git-lfs install
+git clone https://huggingface.co/lmdeploy/internlm-chat-7b-w8 (coming soon)
+```
+
+进行 8bit 权重量化需要经历以下三步：
+
+1. **权重平滑**：首先对语言模型的权重进行平滑处理，以便更好地进行量化。
+2. **模块替换**：使用 `QRSMNorm` 和 `QLinear` 模块替换原模型 `DecoderLayer` 中的 `RSMNorm` 模块和 `nn.Linear` 模块。`lmdeploy/pytorch/models/q_modules.py` 文件中定义了这些量化模块。
+3. **保存量化模型**：完成上述必要的替换后，我们即可保存新的量化模型。
+
+在`lmdeploy/lite/api/smooth_quantity.py`脚本中已经实现了以上三个步骤。例如，可以通过以下命令得到量化后的 Internlm-chat-7B 模型的模型权重：
+
+```shell
+# 手动将原 16bit 权重量化为 8bit，并保存至 `internlm-chat-7b-w8` 目录下
+lmdeploy lite smooth_quant internlm/internlm-chat-7b --work-dir ./internlm-chat-7b-w8
+```
+
+### W4A16 量化
+
+W4A16中的A是指Activation，保持FP16，只对参数进行 4bit 量化。使用过程也是三步
+
+量化权重模型。利用前面得到的统计值对参数进行量化，具体又包括两小步：
+
+- 缩放参数。主要是性能上的考虑。
+- 整体量化。
+
+仅需执行一条命令，就可以完成模型量化工作。量化结束后，权重文件存放在 $WORK_DIR 下
+
+```bash
+# 量化权重模型
+lmdeploy lite auto_awq \
+   $HF_MODEL \                       # Model name or path, either model repo name on huggingface hub like 'internlm/internlm-chat-7b', or a model path in local host
+  --calib-dataset 'ptb' \            # Calibration dataset, supports c4, ptb, wikitext2, pileval
+  --calib-samples 128 \              # Number of samples in the calibration set, if memory is insufficient, you can appropriately reduce this
+  --calib-seqlen 2048 \              # Length of a single piece of text, if memory is insufficient, you can appropriately reduce this
+  --w-bits 4 \                       # Bit number for weight quantization
+  --w-group-size 128 \               # Group size for weight quantization statistics
+  --work-dir $WORK_DIR               # Folder storing Pytorch format quantization statistics parameters and post-quantization weight
+
+# 样例
+lmdeploy lite auto_awq \
+  --model  /root/share/temp/model_repos/internlm-chat-7b/ \
+  --w_bits 4 \
+  --w_group_size 128 \
+  --work_dir ./quant_output
+
+# 可选参数不填写，可使用默认的
+lmdeploy lite auto_awq internlm/ianternlm-chat-7b --work-dir internlm-chat-7b-4bit
+```
+
+命令中 `w_bits` 表示量化的位数，`w_group_size` 表示量化分组统计的尺寸，`work_dir` 是量化后模型输出的位置。这里需要特别说明的是，因为没有 `torch.int4`，所以实际存储时，8个 4bit 权重会被打包到一个 int32 值中。所以，如果你把这部分量化后的参数加载进来就会发现它们是 int32 类型的。
+
+最后一步：转换成 TurboMind 格式。
+
+```bash
+# 转换模型的layout，存放在默认路径 ./workspace 下
+lmdeploy convert  internlm-chat-7b ./quant_output \
+    --model-format awq \
+    --group-size 128
+```
+
+这个 `group-size` 就是上一步的那个 `w_group_size`。如果不想和之前的 `workspace` 重复，可以指定输出目录：`--dst_path`，比如：
+
+```bash
+lmdeploy convert  internlm-chat-7b ./quant_output \
+    --model-format awq \
+    --group-size 128 \
+    --dst_path ./workspace_quant
+```
+
+### 测试聊天效果
+
+lmdeploy chat torch ./internlm-chat-7b-w8
+
+启动gradio服务
+
+lmdeploy serve gradio ./internlm-chat-7b-4bit --server-name {ip_addr} --server-port {port}
+
+
+
 
