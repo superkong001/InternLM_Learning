@@ -1,11 +1,6 @@
-## 安装
+## 准备微调数据集
 
-```Bash
-# 如果你是在 InternStudio 平台，则从本地 clone 一个已有 pytorch 2.0.1 的环境：
-/root/share/install_conda_env_internlm_base.sh Oculi
-#有问题删除：（光使用这个命令没用conda remove --name Oculi --all， 还要删除/root/.conda/envs/Oculi的所有文件）
-conda activate Oculi
-```
+### 准备lora数据集
 
 ```Bash
 # 获取openxlab数据集
@@ -16,7 +11,22 @@ openxlab dataset info --dataset-repo OpenDataLab/MedFMC #数据集信息查看
 openxlab dataset ls --dataset-repo OpenDataLab/MedFMC #数据集文件列表查看
 openxlab dataset get --dataset-repo OpenDataLab/MedFMC #数据集下载
 openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /README.md --target-path /path/to/local/folder #数据集文件下载
+```
 
+> https://huggingface.co/datasets/clip-benchmark/wds_vtab-diabetic_retinopathy/tree/main
+> https://huggingface.co/datasets/Rami/Diabetic_Retinopathy_Preprocessed_Dataset_256x256/tree/main
+
+### 准备Qlora数据集
+> https://huggingface.co/datasets/Toyokolabs/retinoblastoma/tree/main
+
+
+## 安装
+
+```Bash
+# 如果你是在 InternStudio 平台，则从本地 clone 一个已有 pytorch 2.0.1 的环境：
+/root/share/install_conda_env_internlm_base.sh Oculi
+#有问题删除：（光使用这个命令没用conda remove --name Oculi --all， 还要删除/root/.conda/envs/Oculi的所有文件）
+conda activate Oculi
 ```
 
 ```Bash
@@ -67,7 +77,12 @@ git lfs install
 git lfs clone https://modelscope.cn/Shanghai_AI_Laboratory/internlm-chat-7b.git -b v1.0.3
 ```
 
-### 准备微调数据集
+
+
+
+
+
+
 
 
 
