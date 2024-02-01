@@ -233,11 +233,73 @@ NPROC_PER_NODE=${GPU_NUM} xtuner train /root/ft-Oculi/internlm2_chat_7b_qlora_Oc
 # --deepspeed deepspeed_zero2, 开启 deepspeed 加速
 ```
 
+将得到的 PTH 模型转换为 HuggingFace 模型，即：生成 Adapter 文件夹
 
+```Bash
+cd ~/ft-Oculi
+mkdir hf
+# 设置环境变量
+export MKL_SERVICE_FORCE_INTEL=1
 
+xtuner convert pth_to_hf internlm2_chat_7b_qlora_Oculi_e3_copy.py ./work_dirs/internlm2_chat_7b_qlora_Oculi_e3_copy/epoch_1.pth ./hf_Oculi
+```
 
+### 部署与测试
 
+将 HuggingFace adapter 合并到大语言模型：
 
+```Bash
+xtuner convert merge ./internlm2-chat-7b ./hf_Oculi ./merged_Oculi --max-shard-size 2GB
+# xtuner convert merge \
+#     ${NAME_OR_PATH_TO_LLM} \
+#     ${NAME_OR_PATH_TO_ADAPTER} \
+#     ${SAVE_PATH} \
+#     --max-shard-size 2GB
+```
+
+### 与合并后的模型对话：
+
+```Bash
+# 加载 Adapter 模型对话（Float 16）
+# xtuner chat ./merged_Oculi --prompt-template internlm_chat
+
+# 4 bit 量化加载
+xtuner chat ./merged_Oculi --bits 4 --prompt-template internlm_chat
+```
+
+### Demo
+
+```Bash
+cd ~/ft-Oculi
+cp ~/code/InternLM/cli_demo.py cli_demo.py
+vim cli_demo.py
+
+# 修改 cli_demo.py 中的模型路径
+- model_name_or_path = "/root/model/Shanghai_AI_Laboratory/internlm-chat-7b"
++ model_name_or_path = "/root/ft-Oculi/merged_Oculi"
+
+# 运行 cli_demo.py 以目测微调效果
+python cli_demo.py
+
+pip install streamlit==1.24.0
+
+# 创建code文件夹用于存放InternLM项目代码
+mkdir code && cd code
+git clone https://github.com/InternLM/InternLM.git
+
+将 code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-Oculi/merged
+vim web_demo.py
+
+# 修改
++ AutoModelForCausalLM.from_pretrained("/root/ft-Oculi/merged_Oculi", trust_remote_code=True)
++ tokenizer = AutoTokenizer.from_pretrained("/root/ft-Oculi/merged_Oculi", trust_remote_code=True)
+
+streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
+
+# 本地运行
+ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应端口)
+浏览器访问：http://127.0.0.1:6006
+```
 
 
 
