@@ -30,12 +30,11 @@ conda activate Oculi
 ```
 
 ```Bash
-mkdir xtuner019 && cd xtuner019
+mkdir xtuner && cd xtuner
 
-# 拉取 0.1.9 的版本源码
 # git clone -b v0.1.9  https://github.com/InternLM/xtuner
 # 无法访问github的用户请从 gitee 拉取:
-git clone -b v0.1.9 https://gitee.com/Internlm/xtuner
+git clone https://gitee.com/Internlm/xtuner
 
 # 进入源码目录
 cd xtuner
@@ -54,9 +53,109 @@ mkdir ~/ft-Oculi && cd ~/ft-Oculi
 # 列出所有内置配置
 xtuner list-cfg
 假如显示bash: xtuner: command not found的话可以考虑在终端输入 export PATH=$PATH:'/root/.local/bin'
+==========================CONFIGS===========================
+internlm2_20b_qlora_alpaca_e3
+internlm2_20b_qlora_arxiv_gentitle_e3
+internlm2_20b_qlora_code_alpaca_e3
+internlm2_20b_qlora_colorist_e5
+internlm2_20b_qlora_lawyer_e3
+internlm2_20b_qlora_msagent_react_e3_gpu8
+internlm2_20b_qlora_oasst1_512_e3
+internlm2_20b_qlora_oasst1_e3
+internlm2_20b_qlora_sql_e3
+internlm2_7b_qlora_alpaca_e3
+internlm2_7b_qlora_arxiv_gentitle_e3
+internlm2_7b_qlora_code_alpaca_e3
+internlm2_7b_qlora_colorist_e5
+internlm2_7b_qlora_json_e3
+internlm2_7b_qlora_lawyer_e3
+internlm2_7b_qlora_msagent_react_e3_gpu8
+internlm2_7b_qlora_oasst1_512_e3
+internlm2_7b_qlora_oasst1_e3
+internlm2_7b_qlora_sql_e3
+internlm2_7b_w_tokenized_dataset
+internlm2_7b_w_untokenized_dataset
+internlm2_chat_20b_qlora_alpaca_e3
+internlm2_chat_20b_qlora_code_alpaca_e3
+internlm2_chat_20b_qlora_lawyer_e3
+internlm2_chat_20b_qlora_oasst1_512_e3
+internlm2_chat_20b_qlora_oasst1_e3
+internlm2_chat_7b_qlora_alpaca_e3
+internlm2_chat_7b_qlora_code_alpaca_e3
+internlm2_chat_7b_qlora_lawyer_e3
+internlm2_chat_7b_qlora_oasst1_512_e3
+internlm2_chat_7b_qlora_oasst1_e3
+internlm_20b_qlora_alpaca_e3
+internlm_20b_qlora_alpaca_enzh_e3
+internlm_20b_qlora_alpaca_enzh_oasst1_e3
+internlm_20b_qlora_alpaca_zh_e3
+internlm_20b_qlora_arxiv_gentitle_e3
+internlm_20b_qlora_code_alpaca_e3
+internlm_20b_qlora_colorist_e5
+internlm_20b_qlora_lawyer_e3
+internlm_20b_qlora_msagent_react_e3_gpu8
+internlm_20b_qlora_oasst1_512_e3
+internlm_20b_qlora_oasst1_e3
+internlm_20b_qlora_open_platypus_e3
+internlm_20b_qlora_sql_e3
+internlm_7b_full_alpaca_e3
+internlm_7b_full_alpaca_enzh_e3
+internlm_7b_full_alpaca_enzh_oasst1_e3
+internlm_7b_full_alpaca_zh_e3
+internlm_7b_full_intern_repo_dataset_template
+internlm_7b_full_oasst1_e3
+internlm_7b_qlora_alpaca_e3
+internlm_7b_qlora_alpaca_enzh_e3
+internlm_7b_qlora_alpaca_enzh_oasst1_e3
+internlm_7b_qlora_alpaca_zh_e3
+internlm_7b_qlora_arxiv_gentitle_e3
+internlm_7b_qlora_code_alpaca_e3
+internlm_7b_qlora_colorist_e5
+internlm_7b_qlora_json_e3
+internlm_7b_qlora_lawyer_e3
+internlm_7b_qlora_medical_e1
+internlm_7b_qlora_moss_sft_all_e1
+internlm_7b_qlora_moss_sft_all_e2_gpu8
+internlm_7b_qlora_moss_sft_plugins_e1
+internlm_7b_qlora_msagent_react_e3_gpu8
+internlm_7b_qlora_oasst1_512_e3
+internlm_7b_qlora_oasst1_e3
+internlm_7b_qlora_oasst1_e3_hf
+internlm_7b_qlora_oasst1_mmlu_e3
+internlm_7b_qlora_open_platypus_e3
+internlm_7b_qlora_openorca_e1
+internlm_7b_qlora_sql_e3
+internlm_7b_qlora_tiny_codes_e1
+internlm_chat_20b_qlora_alpaca_e3
+internlm_chat_20b_qlora_alpaca_enzh_e3
+internlm_chat_20b_qlora_alpaca_enzh_oasst1_e3
+internlm_chat_20b_qlora_alpaca_zh_e3
+internlm_chat_20b_qlora_code_alpaca_e3
+internlm_chat_20b_qlora_lawyer_e3
+internlm_chat_20b_qlora_oasst1_512_e3
+internlm_chat_20b_qlora_oasst1_e3
+internlm_chat_20b_qlora_open_platypus_e3
+internlm_chat_7b_qlora_alpaca_e3
+internlm_chat_7b_qlora_alpaca_enzh_e3
+internlm_chat_7b_qlora_alpaca_enzh_oasst1_e3
+internlm_chat_7b_qlora_alpaca_zh_e3
+internlm_chat_7b_qlora_arxiv_gentitle_e3
+internlm_chat_7b_qlora_code_alpaca_e3
+internlm_chat_7b_qlora_colorist_e5
+internlm_chat_7b_qlora_lawyer_e3
+internlm_chat_7b_qlora_medical_e1
+internlm_chat_7b_qlora_oasst1_512_e3
+internlm_chat_7b_qlora_oasst1_e3
+internlm_chat_7b_qlora_open_platypus_e3
+internlm_chat_7b_qlora_openorca_e1
+internlm_chat_7b_qlora_sql_e3
+internlm_chat_7b_qlora_tiny_codes_e1
+=============================================================
+```
 
+```Bash
 cd ~/ft-Oculi
-xtuner copy-cfg internlm_chat_7b_qlora_oasst1_e3 .
+xtuner copy-cfg internlm2_chat_7b_qlora_oasst1_e3 .
 ```
 
 ### 模型下载
@@ -65,7 +164,7 @@ xtuner copy-cfg internlm_chat_7b_qlora_oasst1_e3 .
 
 ```Bash
 # 创建一个目录，放模型文件，防止散落一地
-mkdir ~/ft-Oculi/internlm-chat-7b
+mkdir ~/ft-Oculi/internlm2_chat_7b
 
 # 装一下拉取模型文件要用的库
 pip install modelscope
@@ -74,7 +173,7 @@ pip install modelscope
 cd ~/ft-Oculi
 apt install git git-lfs -y
 git lfs install
-git lfs clone https://modelscope.cn/Shanghai_AI_Laboratory/internlm-chat-7b.git -b v1.0.3
+git lfs clone https://modelscope.cn/Shanghai_AI_Laboratory/internlm2_chat_7b.git
 ```
 
 
