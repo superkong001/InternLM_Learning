@@ -249,6 +249,8 @@ train_dataset = dict(
 
 <img width="621" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d4a71ad5-5bd7-48c9-a86c-5ae71fe07fdc">
 
+数据量大跑不动，改max_epochs=1，batch_size = 1
+
 ### 开始微调
 
 训练：
@@ -335,5 +337,9 @@ ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应�
 浏览器访问：http://127.0.0.1:6006
 ```
 
+## 模型上传openxlab
+
+参考小白：
+> https://zhuanlan.zhihu.com/p/681025478
 
 
