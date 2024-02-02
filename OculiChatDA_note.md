@@ -249,7 +249,7 @@ train_dataset = dict(
 
 <img width="621" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d4a71ad5-5bd7-48c9-a86c-5ae71fe07fdc">
 
-数据量大跑不动，改max_epochs=1，batch_size = 1
+数据量大跑不动，改max_epochs=2，batch_size = 4
 
 ### 开始微调
 
@@ -266,8 +266,6 @@ xtuner train /root/ft-Oculi/internlm2_chat_7b_qlora_Oculi_e3_copy.py --deepspeed
 # --deepspeed deepspeed_zero2, 开启 deepspeed 加速
 ```
 
-
-
 将保存的 PTH 模型（如果使用的DeepSpeed，则将会是一个文件夹）转换为 HuggingFace 模型，即：生成 Adapter 文件夹
 
 ```Bash
@@ -276,7 +274,8 @@ mkdir hf_Oculi
 # 设置环境变量
 export MKL_SERVICE_FORCE_INTEL=1
 
-xtuner convert pth_to_hf internlm2_chat_7b_qlora_Oculi_e3_copy.py ./work_dirs/internlm2_chat_7b_qlora_Oculi_e3_copy/epoch_1.pth ./hf_Oculi
+xtuner convert pth_to_hf internlm2_chat_7b_qlora_Oculi_e3_copy.py /root/ft-Oculi/work_dirs/internlm2_chat_7b_qlora_Oculi_e3_copy/iter_500.pth /root/ft-Oculi/hf_Oculi
+
 xtuner convert pth_to_hf ${CONFIG_NAME_OR_PATH} ${PTH} ${SAVE_PATH}
 ```
 
