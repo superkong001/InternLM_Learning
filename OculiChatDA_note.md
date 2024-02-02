@@ -249,7 +249,7 @@ train_dataset = dict(
 
 <img width="621" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d4a71ad5-5bd7-48c9-a86c-5ae71fe07fdc">
 
-数据量大跑不动，改max_epochs=2，batch_size = 4
+数据量大跑不动，改max_epochs=2，batch_size = 4, max_length = 1024
 
 ### 开始微调
 
