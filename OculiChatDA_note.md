@@ -19,10 +19,9 @@ openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /READM
 ## 安装
 
 ```Bash
-# 如果你是在 InternStudio 平台，则从本地 clone 一个已有 pytorch 2.0.1 的环境：
-/root/share/install_conda_env_internlm_base.sh Oculi
-#有问题删除：（光使用这个命令没用conda remove --name Oculi --all， 还要删除/root/.conda/envs/Oculi的所有文件）
+conda create --name Oculi python=3.10 -y
 conda activate Oculi
+#有问题删除：（光使用这个命令没用conda remove --name Oculi --all， 还要删除/root/.conda/envs/Oculi的所有文件）
 ```
 
 ```Bash
@@ -257,7 +256,7 @@ train_dataset = dict(
 ```Bash
 # 单卡
 xtuner train /root/ft-Oculi/internlm2_chat_7b_qlora_Oculi_e3_copy.py --deepspeed deepspeed_zero2
-xtuner train /root/ft-oasst1/internlm_chat_7b_qlora_Oculi_e3_copy.py --deepspeed deepspeed_zero2
+
 # 多卡
 (DIST) NPROC_PER_NODE=${GPU_NUM} xtuner train /root/ft-Oculi/internlm2_chat_7b_qlora_Oculi_e3_copy.py --deepspeed deepspeed_zero2
 (SLURM) srun ${SRUN_ARGS} xtuner train internlm2_chat_7b_qlora_oasst1_e3 --launcher slurm --deepspeed deepspeed_zero2
