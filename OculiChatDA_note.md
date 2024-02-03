@@ -1,4 +1,4 @@
-## 准备微调数据集
+<img width="574" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/2c649eb9-bf50-4494-87bf-cd9b7f763042">## 准备微调数据集
 
 ### 准备lora数据集
 
@@ -300,9 +300,8 @@ mkdir hf_Oculi
 # 设置环境变量
 export MKL_SERVICE_FORCE_INTEL=1
 
-xtuner convert pth_to_hf internlm2_chat_7b_qlora_Oculi_e3_copy.py /root/ft-Oculi/work_dirs/internlm2_chat_7b_qlora_Oculi_e3_copy/iter_500.pth /root/ft-Oculi/hf_Oculi
-
-xtuner convert pth_to_hf ${CONFIG_NAME_OR_PATH} ${PTH} ${SAVE_PATH}
+# xtuner convert pth_to_hf ${CONFIG_NAME_OR_PATH} ${PTH} ${SAVE_PATH}
+xtuner convert pth_to_hf internlm2_chat_7b_qlora_Oculi_e3_copy.py /root/ft-Oculi/work_dirs/internlm2_chat_7b_qlora_Oculi_e3_copy/iter_8295.pth /root/ft-Oculi/hf_Oculi
 ```
 
 ### 部署与测试
@@ -310,6 +309,7 @@ xtuner convert pth_to_hf ${CONFIG_NAME_OR_PATH} ${PTH} ${SAVE_PATH}
 将 HuggingFace adapter 合并到大语言模型：
 
 ```Bash
+cd ~/ft-Oculi
 xtuner convert merge ./internlm2-chat-7b ./hf_Oculi ./merged_Oculi --max-shard-size 2GB
 # xtuner convert merge \
 #     ${NAME_OR_PATH_TO_LLM} \
@@ -331,6 +331,11 @@ xtuner chat ./merged_Oculi --bits 4 --prompt-template internlm_chat
 ### Demo
 
 ```Bash
+# 创建code文件夹用于存放InternLM项目代码
+cd ~
+mkdir code && cd code
+git clone https://github.com/InternLM/InternLM.git
+
 cd ~/ft-Oculi
 cp ~/code/InternLM/cli_demo.py cli_demo.py
 vim cli_demo.py
@@ -344,11 +349,8 @@ python cli_demo.py
 
 pip install streamlit==1.24.0
 
-# 创建code文件夹用于存放InternLM项目代码
-mkdir code && cd code
-git clone https://github.com/InternLM/InternLM.git
-
-将 code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-Oculi/merged
+cp ~/code/InternLM/web_demo.py web_demo.py
+将 code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-Oculi/merged_Oculi
 vim web_demo.py
 
 # 修改
@@ -375,9 +377,95 @@ ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应�
 
 <img width="889" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ebef1748-39af-47bd-afed-1d959e1a715a">
 
-cd ~/merged_Oculi
+cd ~/ft-Oculi/merged_Oculi
 
-将里面的内容复制到 metafile.yml文件中
+新建metafile.yml, 将里面的内容复制到 metafile.yml文件中
+```Bash
+Collections:
+- Name: "internlm2-chat-7b"
+  License: "Apache-2.0"
+  Framework: "[]"
+  Paper: {}
+  Code:
+    URL: "https://github.com/InternLM/InternLM"
+Models:
+- Name: "config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "configuration_internlm.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "generation_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "modeling_internlm2.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00001-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00002-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00003-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00004-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00005-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00006-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00007-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model-00008-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "special_tokens_map.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenization_internlm.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenizer_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "tokenizer.model"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "README.md"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "pytorch_model.bin.index.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+```
+
+<img width="574" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e5dd053d-13d1-4d0d-b5cd-3378c036d8b1">
+
+pip install ruamel.yaml
 
 编辑 convert.py
 
@@ -406,7 +494,26 @@ print("Modifications saved to the file.")
 
 python convert.py 生成好带weight的 metafile.yml
 
-手工修改，将 Name 改为 zhangxiaobai_shishen2_full，URL改为 https://github.com/zhanghui-china/intro_myself，configuration_internlm.py改为 configuration_internlm2.py
+<img width="377" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/857a87a8-99bf-4a7c-8cad-23fb54130b48">
+
+手工修改，将 Name 改为 Oculi-InternLM，URL改为 https://github.com/superkong001/Oculi-InternLM，configuration_internlm.py改为 configuration_internlm2.py
 
 打开 openxlab右上角 账号与安全--》密钥管理:
+
+<img width="587" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cc16cb1c-2afb-46cd-8fc3-ca5c4e0c8224">
+
+将AK,SK复制下来。
+
+配置登录信息：
+
+```Bash
+pip install openxlab
+python
+import openxlab
+openxlab.login(ak='xxx',sk='yyyy')
+```
+
+创建并上传模型：
+
+openxlab model create --model-repo='superkong001/Oculi-InternLM' -s ./metafile.yml
 
