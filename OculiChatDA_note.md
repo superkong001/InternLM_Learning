@@ -1,4 +1,4 @@
-![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/854acd86-d063-4ea7-83f3-afcf01b320b5)## 准备微调数据集
+## 准备微调数据集
 
 ### 准备lora数据集
 
@@ -386,6 +386,7 @@ unzip OpenCompassData-core-20231110.zip
 ```
 
 将会在opencompass下看到data文件夹
+
 ![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/a562f248-29b8-4b75-bec8-e402adb3698b)
 
 ```Bash
