@@ -9,8 +9,28 @@ pip install -U openxlab #版本升级
 openxlab login #进行登录，输入对应的AK/SK
 openxlab dataset info --dataset-repo OpenDataLab/MedFMC #数据集信息查看
 openxlab dataset ls --dataset-repo OpenDataLab/MedFMC #数据集文件列表查看
-openxlab dataset get --dataset-repo OpenDataLab/MedFMC #数据集下载
-openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /README.md --target-path /path/to/local/folder #数据集文件下载
+| /raw/Retino/images.zip                        | 830.6M  
+| /raw/Retino/Retino_published_G5.csv           | 37.2K   
+# openxlab dataset get --dataset-repo OpenDataLab/MedFMC #数据集下载
+# openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /README.md --target-path /path/to/local/folder #数据集文件下载
+openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /raw/Retino/images.zip --target-path /root/ft-Oculi/data
+openxlab dataset download --dataset-repo OpenDataLab/MedFMC --source-path /raw/Retino/Retino_published_G5.csv --target-path /root/ft-Oculi/data
+unzip images.zip -d /root/ft-Oculi/data/OpenDataLab___MedFMC/raw/Retino/images
+```
+
+所下载的图片命名需要进行修改，以确保所有图片后缀为 .jpg
+
+```Bash
+#!/bin/bash
+ocr_vqa_path="/root/ft-Oculi/data/OpenDataLab___MedFMC/raw/Retino/images"
+
+find "$target_dir" -type f | while read file; do
+    extension="${file##*.}"
+    if [ "$extension" != "jpg" ]
+    then
+        cp -- "$file" "${file%.*}.jpg"
+    fi
+done
 ```
 
 > https://huggingface.co/datasets/clip-benchmark/wds_vtab-diabetic_retinopathy/tree/main
@@ -35,6 +55,12 @@ git clone https://github.com/InternLM/xtuner.git
 cd xtuner
 # 从源码安装 XTuner
 pip install -e '.[all]'
+
+# 换路径到 /root/code 克隆 lagent 仓库，并通过 pip install -e . 源码安装 Lagent
+cd /root/code
+git clone https://gitee.com/internlm/lagent.git
+cd /root/code/lagent
+pip install -e . # 源码安装
 
 # 创建一个微调 oasst1 数据集的工作路径，进入
 mkdir ~/ft-Oculi && cd ~/ft-Oculi
