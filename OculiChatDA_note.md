@@ -1,4 +1,4 @@
-## 准备微调数据集
+![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/854acd86-d063-4ea7-83f3-afcf01b320b5)## 准备微调数据集
 
 ### 准备lora数据集
 
@@ -363,6 +363,49 @@ streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
 ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应端口)
 浏览器访问：http://127.0.0.1:6006
 ```
+## 使用 OpenCompass 评测 
+
+评测模型在 C-Eval 数据集上的性能
+
+### 安装
+
+```Bash
+cd ~
+git clone https://gitee.com/zhanghui_china/opencompass.git
+cd opencompass
+pip install -e .
+```
+
+### 评测数据准备
+
+```Bash
+# 下载数据集到 data/ 处
+# wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
+cp /share/temp/datasets/OpenCompassData-core-20231110.zip /root/opencompass/
+unzip OpenCompassData-core-20231110.zip
+```
+
+将会在opencompass下看到data文件夹
+![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/a562f248-29b8-4b75-bec8-e402adb3698b)
+
+```Bash
+# 列出所有跟 internlm 及 ceval 相关的配置
+python tools/list_configs.py internlm ceval
+```
+
+![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/0a7e3934-a015-4263-af32-6a044a80e084)
+
+### 启动在C-Eval 数据集的评测
+
+```Bash
+# 命令行模式
+# 怕跑不动，改小了batch-size
+# python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
+python run.py --datasets ceval_gen --hf-path /root/ft-Oculi/merged_Oculi --tokenizer-path /root/ft-Oculi/merged_Oculi --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
+```
+
+### 测评结果
+
 
 ## 模型上传openxlab
 
