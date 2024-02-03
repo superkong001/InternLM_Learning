@@ -538,7 +538,7 @@ print("Modifications saved to the file.")
 
 python convert.py 生成好带weight的 metafile.yml
 
-手工修改，将 Name 改为 Oculi-InternLM，URL改为https://github.com/superkong001/Oculi-InternLM, configuration_internlm.py改为 configuration_internlm2.py、tokenization_internlm.py 改为 tokenization_internlm2.py
+手工修改，将 Name 改为 Oculi-InternLM2，URL改为https://github.com/superkong001/Oculi-InternLM, configuration_internlm.py改为 configuration_internlm2.py、tokenization_internlm.py 改为 tokenization_internlm2.py
 
 <img width="454" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/38a2ac71-e884-450d-8cb2-c37cdf508ea9">
 
@@ -559,12 +559,12 @@ openxlab.login(ak='xxx',sk='yyyy')
 
 创建并上传模型：
 
-openxlab model create --model-repo='superkong001/Oculi-InternLM' -s ./metafile.yml
+openxlab model create --model-repo='superkong001/Oculi-InternLM2' -s ./metafile.yml
 
 有几个漏改了，继续上传
 
 ```Bash
 python
 from openxlab.model import upload 
-upload(model_repo='superkong001/Oculi-InternLM', file_type='metafile',source="upload1.yml")
+upload(model_repo='superkong001/Oculi-InternLM2', file_type='metafile',source="upload1.yml")
 ```
