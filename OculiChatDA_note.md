@@ -496,8 +496,6 @@ python convert.py 生成好带weight的 metafile.yml
 
 <img width="377" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/857a87a8-99bf-4a7c-8cad-23fb54130b48">
 
-<img width="574" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/2c649eb9-bf50-4494-87bf-cd9b7f763042">
-
 手工修改，将 Name 改为 Oculi-InternLM，URL改为 https://github.com/superkong001/Oculi-InternLM，configuration_internlm.py改为 configuration_internlm2.py
 
 打开 openxlab右上角 账号与安全--》密钥管理:
