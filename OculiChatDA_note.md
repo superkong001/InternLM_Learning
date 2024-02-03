@@ -341,4 +341,46 @@ ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应�
 参考小白：
 > https://zhuanlan.zhihu.com/p/681025478
 
+打开 InternLM2-chat-7b在openxlab上的模型链接：
+
+> https://openxlab.org.cn/models/detail/OpenLMLab/internlm2-chat-7b
+
+切换到 模型文件-> 点击查看元信息：
+
+<img width="889" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ebef1748-39af-47bd-afed-1d959e1a715a">
+
+cd ~/merged_Oculi
+
+将里面的内容复制到 metafile.yml文件中
+
+编辑 convert.py
+
+```Bash
+import sys
+import ruamel.yaml
+
+yaml = ruamel.yaml.YAML()
+yaml.preserve_quotes = True
+yaml.default_flow_style = False
+file_path = 'metafile.yml'
+# 读取YAML文件内容
+with open(file_path, 'r') as file:
+ data = yaml.load(file)
+# 遍历模型列表
+for model in data.get('Models', []):
+ # 为每个模型添加Weights键值对，确保名称被正确引用
+ model['Weights'] = model['Name']
+
+# 将修改后的数据写回文件
+with open(file_path, 'w') as file:
+ yaml.dump(data, file)
+
+print("Modifications saved to the file.")
+```
+
+python convert.py 生成好带weight的 metafile.yml
+
+手工修改，将 Name 改为 zhangxiaobai_shishen2_full，URL改为 https://github.com/zhanghui-china/intro_myself，configuration_internlm.py改为 configuration_internlm2.py
+
+打开 openxlab右上角 账号与安全--》密钥管理:
 
