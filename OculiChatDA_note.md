@@ -225,7 +225,7 @@ cp -r ~/ft-Oculi/internlm-chat-7b .
 
 ```Bash
 # 改个文件名
-mv internlm2_chat_7b_qlora_oasst1_e3_copy.py internlm2_chat_7b_qlora_Oculi_e3_copy.py
+cp internlm2_chat_7b_qlora_oasst1_e3_copy.py internlm2_chat_7b_qlora_Oculi_e3_copy.py
 
 vim internlm2_chat_7b_qlora_Oculi_e3_copy.py
 ```
