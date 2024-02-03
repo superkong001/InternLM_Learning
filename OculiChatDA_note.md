@@ -494,7 +494,7 @@ print("Modifications saved to the file.")
 
 python convert.py 生成好带weight的 metafile.yml
 
-<img width="377" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/857a87a8-99bf-4a7c-8cad-23fb54130b48">
+<img width="454" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/38a2ac71-e884-450d-8cb2-c37cdf508ea9">
 
 手工修改，将 Name 改为 Oculi-InternLM，URL改为 https://github.com/superkong001/Oculi-InternLM，configuration_internlm.py改为 configuration_internlm2.py
 
