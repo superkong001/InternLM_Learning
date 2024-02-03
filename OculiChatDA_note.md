@@ -542,8 +542,6 @@ python convert.py 生成好带weight的 metafile.yml
 
 <img width="454" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/38a2ac71-e884-450d-8cb2-c37cdf508ea9">
 
-
-
 打开 openxlab右上角 账号与安全--》密钥管理:
 
 <img width="587" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/cc16cb1c-2afb-46cd-8fc3-ca5c4e0c8224">
@@ -563,3 +561,10 @@ openxlab.login(ak='xxx',sk='yyyy')
 
 openxlab model create --model-repo='superkong001/Oculi-InternLM' -s ./metafile.yml
 
+有几个漏改了，继续上传
+
+```Bash
+python
+from openxlab.model import upload 
+upload(model_repo='superkong001/Oculi-InternLM', file_type='metafile',source="upload1.yml")
+```
