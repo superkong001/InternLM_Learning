@@ -527,6 +527,9 @@ python run.py --datasets medbench_gen --hf-path /root/ft-Oculi/merged_Oculi --to
 ### Lagent 安装
 
 ```Bash
+# 通过 pip 进行安装 (推荐)
+pip install lagent
+
 # 换路径到 /root/code 克隆 lagent 仓库，并通过 pip install -e . 源码安装 Lagent
 cd /root/code
 git clone https://gitee.com/internlm/lagent.git
@@ -548,12 +551,13 @@ import os
 
 import streamlit as st
 from streamlit.logger import get_logger
-
-from lagent.actions import ActionExecutor, GoogleSearch, PythonInterpreter, fundus_diagnosis
+from lagent.actions import ActionExecutor
 from lagent.agents.react import ReAct
-from lagent.llms import GPTAPI
 from lagent.llms.huggingface import HFTransformerCasualLM
 
+from fundus_diagnosis import FundusDiagnosis
+from modelscope import snapshot_download
+from lagent.llms.meta_template import INTERNLM2_META as META
 
 class SessionState:
 
@@ -562,8 +566,14 @@ class SessionState:
         st.session_state['assistant'] = []
         st.session_state['user'] = []
 
+        # add
+        cache_dir = "glaucoma_cls_dr_grading"
+        model_path = os.path.join(cache_dir, "flyer123/GlauClsDRGrading", "model.onnx")
+        if not os.path.exists(model_path):
+            snapshot_download("flyer123/GlauClsDRGrading", cache_dir=cache_dir)
+        
         #action_list = [PythonInterpreter(), GoogleSearch()]
-        action_list = [fundus_diagnosis()]
+        action_list = [FundusDiagnosis(model_path=model_path)]
         st.session_state['plugin_map'] = {
             action.name: action
             for action in action_list
@@ -624,18 +634,15 @@ class StreamlitUI:
         if st.sidebar.button('清空对话', key='clear'):
             self.session_state.clear_state()
         uploaded_file = st.sidebar.file_uploader(
-            '上传文件', type=['png', 'jpg', 'jpeg', 'mp4', 'mp3', 'wav'])
+            '上传文件', type=['png', 'jpg', 'jpeg'])
         return model_name, model, plugin_action, uploaded_file
 
     def init_model(self, option):
         """Initialize the model based on the selected option."""
         if option not in st.session_state['model_map']:
-            if option.startswith('gpt'):
-                st.session_state['model_map'][option] = GPTAPI(
-                    model_type=option)
-            else:
-                st.session_state['model_map'][option] = HFTransformerCasualLM(
-                    '/root/ft-Oculi/merged_Oculi')
+            # modify
+            st.session_state['model_map'][option] = HFTransformerCasualLM(
+                    '/root/ft-Oculi/merged_Oculi', meta_template=META)
         return st.session_state['model_map'][option]
 
     def initialize_chatbot(self, model, plugin_action):
@@ -737,10 +744,7 @@ def main():
             file_type = uploaded_file.type
             if 'image' in file_type:
                 st.image(file_bytes, caption='Uploaded Image')
-            elif 'video' in file_type:
-                st.video(file_bytes, caption='Uploaded Video')
-            elif 'audio' in file_type:
-                st.audio(file_bytes, caption='Uploaded Audio')
+            
             # Save the file to a temporary location and get the path
             file_path = os.path.join(root_dir, uploaded_file.name)
             with open(file_path, 'wb') as tmpfile:
@@ -749,6 +753,13 @@ def main():
             user_input = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
                 file_path=file_path, user_input=user_input)
         agent_return = st.session_state['chatbot'].chat(user_input)
+        # if file_path is not None:
+        #     # {"image_path": "/root/GlauClsDRGrading/data/refuge/images/g0001.jpg"}
+        #     user_input = '{"image_path": "{file_path}"}'.format(
+        #         file_path=file_path)
+        #     agent_return = st.session_state['chatbot'].chat(user_input)
+        # else:
+        #     agent_return = None
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
         logger.info(agent_return.inner_steps)
         st.session_state['ui'].render_assistant(agent_return)
@@ -764,6 +775,78 @@ if __name__ == '__main__':
 lagent的主要代码， 内嵌一个DR分级和青光眼分类，文件存入/root/code/lagent/lagent/actions
 
 > https://github.com/JieGenius/OculiChatDA/blob/main/utils/actions/fundus_diagnosis.py
+
+/root/code/lagent/transform.py
+
+```Bash
+import cv2
+
+
+def resized_edge(img, scale, edge='short', interpolation='bicubic'):
+    """Resize image to a proper size while keeping aspect ratio.
+    Args:
+        img (ndarray): The input image.
+        scale (int): The target size.
+        edge (str): The edge to be matched. Options are "short", "long".
+            Default: "short".
+        interpolation (str): The interpolation method. Options are "nearest",
+            "bilinear", "bicubic", "area", "lanczos". Default: "bicubic".
+    Returns:
+        ndarray: The resized image.
+    """
+    h, w = img.shape[:2]
+    if edge == 'short':
+        if h < w:
+            ow = scale
+            oh = int(scale * h / w)
+        else:
+            oh = scale
+            ow = int(scale * w / h)
+    elif edge == 'long':
+        if h > w:
+            ow = scale
+            oh = int(scale * h / w)
+        else:
+            oh = scale
+            ow = int(scale * w / h)
+    else:
+        raise ValueError(
+            f'The edge must be "short" or "long", but got {edge}.')
+
+    if interpolation == 'nearest':
+        interpolation = cv2.INTER_NEAREST
+    elif interpolation == 'bilinear':
+        interpolation = cv2.INTER_LINEAR
+    elif interpolation == 'bicubic':
+        interpolation = cv2.INTER_CUBIC
+    elif interpolation == 'area':
+        interpolation = cv2.INTER_AREA
+    elif interpolation == 'lanczos':
+        interpolation = cv2.INTER_LANCZOS4
+    else:
+        raise ValueError(
+            f'The interpolation must be "nearest", "bilinear", "bicubic", '
+            f'"area" or "lanczos", but got {interpolation}.')
+
+    img = cv2.resize(img, (ow, oh), interpolation=interpolation)
+
+    return img
+
+def center_crop(img, crop_size):
+    """Crop the center of image.
+    Args:
+        img (ndarray): The input image.
+        crop_size (int): The crop size.
+    Returns:
+        ndarray: The cropped image.
+    """
+    h, w = img.shape[:2]
+    th, tw = crop_size, crop_size
+    i = int(round((h - th) / 2.))
+    j = int(round((w - tw) / 2.))
+    img = img[i:i + th, j:j + tw, ...]
+    return img
+```
 
 训练代码在：
 
