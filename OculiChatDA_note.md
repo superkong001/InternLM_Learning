@@ -942,3 +942,39 @@ python
 from openxlab.model import upload 
 upload(model_repo='superkong001/Oculi-InternLM2', file_type='metafile',source="upload1.yml")
 ```
+
+## 模型上传modelscope
+
+在modelscope创建模型
+
+<img width="627" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/f63e4eb6-a8f7-408d-ba0b-3c429b05c471">
+
+```Bash
+mkdir ~/modelscope
+cd ~/modelscope
+apt-get install git-lfs
+git clone https://www.modelscope.cn/teloskong/Oculi-InternLM2.git
+
+# 将 /root/ft-Oculi/merged_Oculi模型文件覆盖 Oculi-InternLM2 下的文件
+cd Oculi-InternLM2/
+cp /root/ft-Oculi/merged_Oculi/* .
+cp /root/ft-Oculi/merged_Oculi/README.md .
+```
+
+<img width="537" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/9ed16d0c-683a-4729-9850-e503e8117ceb">
+
+```Bash
+git add *
+git config --global user.name "teloskong"
+git commit -m "Oculi-InternLM2 Model V20240204"
+```
+
+<img width="758" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/44340069-fd26-42d2-8dd2-bf4967c64284">
+
+```Bash
+git push
+```
+
+<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
+
+
