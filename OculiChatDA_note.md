@@ -56,12 +56,6 @@ cd xtuner
 # 从源码安装 XTuner
 pip install -e '.[all]'
 
-# 换路径到 /root/code 克隆 lagent 仓库，并通过 pip install -e . 源码安装 Lagent
-cd /root/code
-git clone https://gitee.com/internlm/lagent.git
-cd /root/code/lagent
-pip install -e . # 源码安装
-
 # 创建一个微调 oasst1 数据集的工作路径，进入
 mkdir ~/ft-Oculi && cd ~/ft-Oculi
 ```
@@ -383,6 +377,12 @@ pip install -e .
 # wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-core-20231110.zip
 cp /share/temp/datasets/OpenCompassData-core-20231110.zip /root/opencompass/
 unzip OpenCompassData-core-20231110.zip
+
+# 完整数据集
+wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
+unzip OpenCompassData-complete-20231110.zip
+cd ./data
+find . -name "*.zip" -exec unzip {} \;
 ```
 
 将会在opencompass下看到data文件夹
@@ -390,11 +390,11 @@ unzip OpenCompassData-core-20231110.zip
 ![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/a562f248-29b8-4b75-bec8-e402adb3698b)
 
 ```Bash
-# 列出所有跟 internlm 及 ceval 相关的配置
-python tools/list_configs.py internlm ceval
+# 列出所有跟 internlm 及 ceval、medbench 相关的配置
+python tools/list_configs.py internlm ceval medbench
 ```
 
-![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/0a7e3934-a015-4263-af32-6a044a80e084)
+<img width="682" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/22047805-85dd-4784-a75d-731a2396f2dc">
 
 ### 启动在C-Eval 数据集的评测
 
@@ -403,9 +403,41 @@ python tools/list_configs.py internlm ceval
 # 怕跑不动，改小了batch-size
 # python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
 python run.py --datasets ceval_gen --hf-path /root/ft-Oculi/merged_Oculi --tokenizer-path /root/ft-Oculi/merged_Oculi --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
+python run.py --datasets medbench_gen --hf-path /root/ft-Oculi/merged_Oculi --tokenizer-path /root/ft-Oculi/merged_Oculi --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
+
+--datasets ceval_gen \
+--hf-path /root/ft-Oculi/merged_Oculi \  # HuggingFace 模型路径
+--tokenizer-path /root/ft-Oculi/merged_Oculi \  # HuggingFace tokenizer 路径（如果与模型路径相同，可以省略）
+--tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True \  # 构建 tokenizer 的参数
+--model-kwargs device_map='auto' trust_remote_code=True \  # 构建模型的参数
+--max-seq-len 2048 \  # 模型可以接受的最大序列长度
+--max-out-len 16 \  # 生成的最大 token 数
+--batch-size 2  \  # 批量大小
+--num-gpus 1  # 运行模型所需的 GPU 数量
+--debug
 ```
 
 ### 测评结果
+
+## Lagent 智能体工具调用
+
+### Lagent 安装
+
+```Bash
+# 换路径到 /root/code 克隆 lagent 仓库，并通过 pip install -e . 源码安装 Lagent
+cd /root/code
+git clone https://gitee.com/internlm/lagent.git
+cd /root/code/lagent
+pip install -e . # 源码安装
+```
+
+lagent的主要代码， 内嵌一个DR分级和青光眼分类
+
+> https://github.com/JieGenius/OculiChatDA/blob/main/utils/actions/fundus_diagnosis.py
+
+训练代码在：
+
+> https://github.com/JieGenius/GlauClsDRGrading
 
 
 ## 模型上传openxlab
