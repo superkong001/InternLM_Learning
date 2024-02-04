@@ -330,28 +330,29 @@ cd ~
 mkdir code && cd code
 git clone https://github.com/InternLM/InternLM.git
 
-cd ~/ft-Oculi
-cp ~/code/InternLM/cli_demo.py cli_demo.py
-vim cli_demo.py
+cd ~/code/InternLM/
+cp ~/code/InternLM/cli_demo.py cli_Oculi_demo.py
+vim cli_Oculi_demo.py
 
 # 修改 cli_demo.py 中的模型路径
 - model_name_or_path = "/root/model/Shanghai_AI_Laboratory/internlm-chat-7b"
 + model_name_or_path = "/root/ft-Oculi/merged_Oculi"
 
 # 运行 cli_demo.py 以目测微调效果
-python cli_demo.py
+python /root/code/InternLM/cli_Oculi_demo.py
 
 pip install streamlit==1.24.0
 
-cp ~/code/InternLM/web_demo.py web_demo.py
+cd ~/code/InternLM
+cp ~/code/InternLM/web_demo.py web_Oculi_demo.py
 将 code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-Oculi/merged_Oculi
-vim web_demo.py
+vim web_Oculi_demo.py
 
 # 修改
 + AutoModelForCausalLM.from_pretrained("/root/ft-Oculi/merged_Oculi", trust_remote_code=True)
 + tokenizer = AutoTokenizer.from_pretrained("/root/ft-Oculi/merged_Oculi", trust_remote_code=True)
 
-streamlit run web_demo.py --server.address 127.0.0.1 --server.port 6006
+streamlit run /root/code/InternLM/web_Oculi_demo.py --server.address 127.0.0.1 --server.port 6006
 
 # 本地运行
 ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应端口)
@@ -379,10 +380,40 @@ cp /share/temp/datasets/OpenCompassData-core-20231110.zip /root/opencompass/
 unzip OpenCompassData-core-20231110.zip
 
 # 完整数据集
+0.2.1
 wget https://github.com/open-compass/opencompass/releases/download/0.1.8.rc1/OpenCompassData-complete-20231110.zip
 unzip OpenCompassData-complete-20231110.zip
 cd ./data
 find . -name "*.zip" -exec unzip {} \;
+
+mkdir /root/opencompass/data/MedBench && cd /root/opencompass/data/MedBench
+wget https://cdn-static.openxlab.org.cn/medical/MedBench.zip
+unzip MedBench.zip
+```
+
+需要将MedBench里所有文件名中的_test去掉
+
+rename_files.sh
+
+```Bash
+#!/bin/bash
+
+TARGET_DIR="/root/opencompass/data/MedBench"
+# 使用find命令查找所有文件和目录，然后通过循环处理每个匹配项
+find "$TARGET_DIR" -type f -name "*_test*" | while read file; do
+    # 构造新的文件名，去掉 "_test"
+    new_name=$(echo "$file" | sed 's/_test//g')
+    # 重命名文件
+    mv "$file" "$new_name"
+    echo "Renamed $file to $new_name"
+done
+```
+
+```Bash
+# 给这个脚本文件赋予执行权限
+chmod +x rename_files.sh
+# 运行脚本
+./rename_files.sh
 ```
 
 将会在opencompass下看到data文件夹
@@ -400,6 +431,7 @@ python tools/list_configs.py internlm ceval medbench
 
 ```Bash
 # 命令行模式
+cd ~/opencompass
 # 怕跑不动，改小了batch-size
 # python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
 python run.py --datasets ceval_gen --hf-path /root/ft-Oculi/merged_Oculi --tokenizer-path /root/ft-Oculi/merged_Oculi --tokenizer-kwargs padding_side='left' truncation='left' trust_remote_code=True --model-kwargs trust_remote_code=True device_map='auto' --max-seq-len 2048 --max-out-len 16 --batch-size 2 --num-gpus 1 --debug
@@ -431,7 +463,234 @@ cd /root/code/lagent
 pip install -e . # 源码安装
 ```
 
-lagent的主要代码， 内嵌一个DR分级和青光眼分类
+### 修改代码
+
+```Bash
+cp /root/code/lagent/examples/react_web_demo.py /root/code/lagent/react_Oculi_web_demo.py
+```
+
+修改react_Oculi_web_demo.py内容
+
+```Bash
+import copy
+import os
+
+import streamlit as st
+from streamlit.logger import get_logger
+
+from lagent.actions import ActionExecutor, GoogleSearch, PythonInterpreter, fundus_diagnosis
+from lagent.agents.react import ReAct
+from lagent.llms import GPTAPI
+from lagent.llms.huggingface import HFTransformerCasualLM
+
+
+class SessionState:
+
+    def init_state(self):
+        """Initialize session state variables."""
+        st.session_state['assistant'] = []
+        st.session_state['user'] = []
+
+        #action_list = [PythonInterpreter(), GoogleSearch()]
+        action_list = [fundus_diagnosis()]
+        st.session_state['plugin_map'] = {
+            action.name: action
+            for action in action_list
+        }
+        st.session_state['model_map'] = {}
+        st.session_state['model_selected'] = None
+        st.session_state['plugin_actions'] = set()
+
+    def clear_state(self):
+        """Clear the existing session state."""
+        st.session_state['assistant'] = []
+        st.session_state['user'] = []
+        st.session_state['model_selected'] = None
+        if 'chatbot' in st.session_state:
+            st.session_state['chatbot']._session_history = []
+
+
+class StreamlitUI:
+
+    def __init__(self, session_state: SessionState):
+        self.init_streamlit()
+        self.session_state = session_state
+
+    def init_streamlit(self):
+        """Initialize Streamlit's UI settings."""
+        st.set_page_config(
+            layout='wide',
+            page_title='lagent-web',
+            page_icon='./docs/imgs/lagent_icon.png')
+        # st.header(':robot_face: :blue[Lagent] Web Demo ', divider='rainbow')
+        st.sidebar.title('模型控制')
+
+    def setup_sidebar(self):
+        """Setup the sidebar for model and plugin selection."""
+        model_name = st.sidebar.selectbox(
+            '模型选择：', options=['internlm2'])
+        if model_name != st.session_state['model_selected']:
+            model = self.init_model(model_name)
+            self.session_state.clear_state()
+            st.session_state['model_selected'] = model_name
+            if 'chatbot' in st.session_state:
+                del st.session_state['chatbot']
+        else:
+            model = st.session_state['model_map'][model_name]
+
+        plugin_name = st.sidebar.multiselect(
+            '插件选择',
+            options=list(st.session_state['plugin_map'].keys()),
+            default=[list(st.session_state['plugin_map'].keys())[0]],
+        )
+
+        plugin_action = [
+            st.session_state['plugin_map'][name] for name in plugin_name
+        ]
+        if 'chatbot' in st.session_state:
+            st.session_state['chatbot']._action_executor = ActionExecutor(
+                actions=plugin_action)
+        if st.sidebar.button('清空对话', key='clear'):
+            self.session_state.clear_state()
+        uploaded_file = st.sidebar.file_uploader(
+            '上传文件', type=['png', 'jpg', 'jpeg', 'mp4', 'mp3', 'wav'])
+        return model_name, model, plugin_action, uploaded_file
+
+    def init_model(self, option):
+        """Initialize the model based on the selected option."""
+        if option not in st.session_state['model_map']:
+            if option.startswith('gpt'):
+                st.session_state['model_map'][option] = GPTAPI(
+                    model_type=option)
+            else:
+                st.session_state['model_map'][option] = HFTransformerCasualLM(
+                    '/root/ft-Oculi/merged_Oculi')
+        return st.session_state['model_map'][option]
+
+    def initialize_chatbot(self, model, plugin_action):
+        """Initialize the chatbot with the given model and plugin actions."""
+        return ReAct(
+            llm=model, action_executor=ActionExecutor(actions=plugin_action))
+
+    def render_user(self, prompt: str):
+        with st.chat_message('user'):
+            st.markdown(prompt)
+
+    def render_assistant(self, agent_return):
+        with st.chat_message('assistant'):
+            for action in agent_return.actions:
+                if (action):
+                    self.render_action(action)
+            st.markdown(agent_return.response)
+
+    def render_action(self, action):
+        with st.expander(action.type, expanded=True):
+            st.markdown(
+                "<p style='text-align: left;display:flex;'> <span style='font-size:14px;font-weight:600;width:70px;text-align-last: justify;'>插    件</span><span style='width:14px;text-align:left;display:block;'>:</span><span style='flex:1;'>"  # noqa E501
+                + action.type + '</span></p>',
+                unsafe_allow_html=True)
+            st.markdown(
+                "<p style='text-align: left;display:flex;'> <span style='font-size:14px;font-weight:600;width:70px;text-align-last: justify;'>思考步骤</span><span style='width:14px;text-align:left;display:block;'>:</span><span style='flex:1;'>"  # noqa E501
+                + action.thought + '</span></p>',
+                unsafe_allow_html=True)
+            if (isinstance(action.args, dict) and 'text' in action.args):
+                st.markdown(
+                    "<p style='text-align: left;display:flex;'><span style='font-size:14px;font-weight:600;width:70px;text-align-last: justify;'> 执行内容</span><span style='width:14px;text-align:left;display:block;'>:</span></p>",  # noqa E501
+                    unsafe_allow_html=True)
+                st.markdown(action.args['text'])
+            self.render_action_results(action)
+
+    def render_action_results(self, action):
+        """Render the results of action, including text, images, videos, and
+        audios."""
+        if (isinstance(action.result, dict)):
+            st.markdown(
+                "<p style='text-align: left;display:flex;'><span style='font-size:14px;font-weight:600;width:70px;text-align-last: justify;'> 执行结果</span><span style='width:14px;text-align:left;display:block;'>:</span></p>",  # noqa E501
+                unsafe_allow_html=True)
+            if 'text' in action.result:
+                st.markdown(
+                    "<p style='text-align: left;'>" + action.result['text'] +
+                    '</p>',
+                    unsafe_allow_html=True)
+            if 'image' in action.result:
+                image_path = action.result['image']
+                image_data = open(image_path, 'rb').read()
+                st.image(image_data, caption='Generated Image')
+            if 'video' in action.result:
+                video_data = action.result['video']
+                video_data = open(video_data, 'rb').read()
+                st.video(video_data)
+            if 'audio' in action.result:
+                audio_data = action.result['audio']
+                audio_data = open(audio_data, 'rb').read()
+                st.audio(audio_data)
+
+
+def main():
+    logger = get_logger(__name__)
+    # Initialize Streamlit UI and setup sidebar
+    if 'ui' not in st.session_state:
+        session_state = SessionState()
+        session_state.init_state()
+        st.session_state['ui'] = StreamlitUI(session_state)
+
+    else:
+        st.set_page_config(
+            layout='wide',
+            page_title='lagent-web',
+            page_icon='./docs/imgs/lagent_icon.png')
+        # st.header(':robot_face: :blue[Lagent] Web Demo ', divider='rainbow')
+    model_name, model, plugin_action, uploaded_file = st.session_state[
+        'ui'].setup_sidebar()
+
+    # Initialize chatbot if it is not already initialized
+    # or if the model has changed
+    if 'chatbot' not in st.session_state or model != st.session_state[
+            'chatbot']._llm:
+        st.session_state['chatbot'] = st.session_state[
+            'ui'].initialize_chatbot(model, plugin_action)
+
+    for prompt, agent_return in zip(st.session_state['user'],
+                                    st.session_state['assistant']):
+        st.session_state['ui'].render_user(prompt)
+        st.session_state['ui'].render_assistant(agent_return)
+    # User input form at the bottom (this part will be at the bottom)
+    # with st.form(key='my_form', clear_on_submit=True):
+
+    if user_input := st.chat_input(''):
+        st.session_state['ui'].render_user(user_input)
+        st.session_state['user'].append(user_input)
+        # Add file uploader to sidebar
+        if uploaded_file:
+            file_bytes = uploaded_file.read()
+            file_type = uploaded_file.type
+            if 'image' in file_type:
+                st.image(file_bytes, caption='Uploaded Image')
+            elif 'video' in file_type:
+                st.video(file_bytes, caption='Uploaded Video')
+            elif 'audio' in file_type:
+                st.audio(file_bytes, caption='Uploaded Audio')
+            # Save the file to a temporary location and get the path
+            file_path = os.path.join(root_dir, uploaded_file.name)
+            with open(file_path, 'wb') as tmpfile:
+                tmpfile.write(file_bytes)
+            st.write(f'File saved at: {file_path}')
+            user_input = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
+                file_path=file_path, user_input=user_input)
+        agent_return = st.session_state['chatbot'].chat(user_input)
+        st.session_state['assistant'].append(copy.deepcopy(agent_return))
+        logger.info(agent_return.inner_steps)
+        st.session_state['ui'].render_assistant(agent_return)
+
+
+if __name__ == '__main__':
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root_dir = os.path.join(root_dir, 'tmp_dir')
+    os.makedirs(root_dir, exist_ok=True)
+    main()
+```
+
+lagent的主要代码， 内嵌一个DR分级和青光眼分类，文件存入/root/code/lagent/lagent/actions
 
 > https://github.com/JieGenius/OculiChatDA/blob/main/utils/actions/fundus_diagnosis.py
 
@@ -439,6 +698,18 @@ lagent的主要代码， 内嵌一个DR分级和青光眼分类
 
 > https://github.com/JieGenius/GlauClsDRGrading
 
+### Demo 运行
+
+```Bash
+pip install onnxruntime
+pip install utils
+
+streamlit run /root/code/lagent/react_Oculi_web_demo.py --server.address 127.0.0.1 --server.port 6006
+# 配置公钥。。。
+# 本地执行
+ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 34060
+# http://0.0.0.0:6006/
+```
 
 ## 模型上传openxlab
 
