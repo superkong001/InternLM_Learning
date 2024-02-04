@@ -344,7 +344,7 @@ python /root/code/InternLM/cli_Oculi_demo.py
 pip install streamlit==1.24.0
 
 cd ~/code/InternLM
-cp ~/code/InternLM/web_demo.py web_Oculi_demo.py
+cp ~/code/InternLM/chat/web_demo.py web_Oculi_demo.py
 将 code/InternLM/web_demo.py 中 29 行和 33 行的模型路径更换为Merge后存放参数的路径 /root/ft-Oculi/merged_Oculi
 vim web_Oculi_demo.py
 
@@ -357,6 +357,75 @@ streamlit run /root/code/InternLM/web_Oculi_demo.py --server.address 127.0.0.1 -
 # 本地运行
 ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 33090(修改对应端口)
 浏览器访问：http://127.0.0.1:6006
+```
+
+## 量化
+
+### 安装 lmdeploy
+
+```Bash
+# 解决 ModuleNotFoundError: No module named 'packaging' 问题
+pip install packaging
+# 使用 flash_attn 的预编译包解决安装过慢问题
+pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
+
+# pip install 'lmdeploy[all]==v0.1.0'
+pip install lmdeploy
+```
+
+lmdeploy convert internlm2-chat-7b  /root/ft-Oculi/merged_Oculi/
+
+### 开启 KV Cache INT8
+
+kv cache PTQ 量化，使用的公式如下：
+```Bash
+zp = (min+max) / 2
+scale = (max-min) / 255
+quant: q = round( (f-zp) / scale)
+dequant: f = q * scale + zp
+```
+
+```Bash
+# 获取量化参数，并保存至原HF模型目录
+# get minmax
+export HF_MODEL=/root/ft-Oculi/merged_Oculi/
+
+lmdeploy lite calibrate \
+  $HF_MODEL \
+  --calib-dataset 'ptb' \
+  --calib-samples 128 \
+  --calib-seqlen 2048 \
+  --work-dir $HF_MODEL
+
+# 还不行，RuntimeError: Currently, quantification and calibration of InternLM2ForCausalLM are not supported. The supported model types are InternLMForCausalLM, QWenLMHeadModel, BaiChuanForCausalLM, BaichuanForCausalLM, LlamaForCausalLM.
+
+#测试聊天效果。注意需要添加参数--quant-policy 4以开启KV Cache int8模式
+lmdeploy chat turbomind $HF_MODEL --model-format hf --quant-policy 4
+```
+
+### w4a16
+
+```Bash
+# LMDeploy 使用 AWQ 算法，实现模型 4bit 权重量化
+export HF_MODEL=/root/ft-Oculi/merged_Oculi/
+export WORK_DIR=/root/ft-Oculi/merged_Oculi-4bit/
+
+lmdeploy lite auto_awq \
+   $HF_MODEL \
+  --calib-dataset 'ptb' \
+  --calib-samples 128 \
+  --calib-seqlen 2048 \
+  --w-bits 4 \
+  --w-group-size 128 \
+  --work-dir $WORK_DIR
+
+# 还不行，KeyError: 'InternLM2ForCausalLM'
+
+# 测试效果
+# 直接在控制台和模型对话
+lmdeploy chat turbomind ./internlm-chat-7b-4bit --model-format awq
+# 启动gradio服务
+lmdeploy serve gradio ./internlm-chat-7b-4bit --server-name {ip_addr} --server-port {port} --model-format awq
 ```
 ## 使用 OpenCompass 评测 
 
@@ -450,6 +519,8 @@ python run.py --datasets medbench_gen --hf-path /root/ft-Oculi/merged_Oculi --to
 ```
 
 ### 测评结果
+
+<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/9178e06c-70d7-47a2-b03b-793ef219f036">
 
 ## Lagent 智能体工具调用
 
