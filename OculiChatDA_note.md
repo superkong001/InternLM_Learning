@@ -1181,6 +1181,8 @@ git push # 输入用户名和密码
 
 <img width="758" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/44340069-fd26-42d2-8dd2-bf4967c64284">
 
+<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
+
 ## modelscope部署
 
 创建 app.py 添加至代码仓库
@@ -1197,5 +1199,5 @@ if __name__ == '__main__':
 
 <img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe1c9f70-c8a8-437a-addb-a5eea84bae07">
 
-<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
+<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/827638aa-0ba4-4018-8b02-bc62e6d9e05f">
 
