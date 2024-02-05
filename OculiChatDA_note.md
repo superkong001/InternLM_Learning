@@ -559,6 +559,8 @@ from fundus_diagnosis import FundusDiagnosis
 from modelscope import snapshot_download
 from lagent.llms.meta_template import INTERNLM2_META as META
 
+# MODEL_DIR = "/root/ft-Oculi/merged_Oculi"
+MODEL_DIR = "./telos/Oculi-InternLM2"
 class SessionState:
 
     def init_state(self):
@@ -637,14 +639,17 @@ class StreamlitUI:
             '上传文件', type=['png', 'jpg', 'jpeg'])
         return model_name, model, plugin_action, uploaded_file
 
+    @staticmethod
+    def load_mymodel():
+        return HFTransformerCasualLM(MODEL_DIR, meta_template=META)
+    
     def init_model(self, option):
         """Initialize the model based on the selected option."""
         if option not in st.session_state['model_map']:
             # modify
-            st.session_state['model_map'][option] = HFTransformerCasualLM(
-                    '/root/ft-Oculi/merged_Oculi', meta_template=META)
+            st.session_state['model_map'][option] = self.load_mymodel()
         return st.session_state['model_map'][option]
-
+        
     def initialize_chatbot(self, model, plugin_action):
         """Initialize the chatbot with the given model and plugin actions."""
         return ReAct(
@@ -753,22 +758,24 @@ def main():
             user_input = '我上传了一个图像，路径为: {file_path}. {user_input}'.format(
                 file_path=file_path, user_input=user_input)
         agent_return = st.session_state['chatbot'].chat(user_input)
-        # if file_path is not None:
-        #     # {"image_path": "/root/GlauClsDRGrading/data/refuge/images/g0001.jpg"}
-        #     user_input = '{"image_path": "{file_path}"}'.format(
-        #         file_path=file_path)
-        #     agent_return = st.session_state['chatbot'].chat(user_input)
-        # else:
-        #     agent_return = None
         st.session_state['assistant'].append(copy.deepcopy(agent_return))
         logger.info(agent_return.inner_steps)
         st.session_state['ui'].render_assistant(agent_return)
 
-
 if __name__ == '__main__':
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    root_dir = os.path.join(root_dir, 'tmp_dir')
+    root_dir = "tmp_dir"
     os.makedirs(root_dir, exist_ok=True)
+    if not os.path.exists(MODEL_DIR):
+        from openxlab.model import download
+
+        download(model_repo='telos/Oculi-InternLM2', output=MODEL_DIR)
+
+        print("解压后目录结果如下：")
+        print(os.listdir(MODEL_DIR))
+
+    # root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # root_dir = os.path.join(root_dir, 'tmp_dir')
+    # os.makedirs(root_dir, exist_ok=True)
     main()
 ```
 
@@ -954,23 +961,7 @@ Models:
   Results:
   - Task: "Text Generation"
     Dataset: "none"
-- Name: "README.md"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
 - Name: "pytorch_model.bin.index.json"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-- Name: "react_Oculi_web_demo.py"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-- Name: "fundus_diagnosis.py"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-- Name: "transform.py"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
@@ -1096,31 +1087,11 @@ Models:
   - Task: "Text Generation"
     Dataset: "none"
   Weights: "tokenizer.model"
-- Name: "README.md"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-  Weights: "README.md"
 - Name: "pytorch_model.bin.index.json"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
   Weights: "pytorch_model.bin.index.json"
-- Name: "react_Oculi_web_demo.py"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-  Weights: "react_Oculi_web_demo.py"
-- Name: "fundus_diagnosis.py"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-  Weights: "fundus_diagnosis.py"
-- Name: "transform.py"
-  Results:
-  - Task: "Text Generation"
-    Dataset: "none"
-  Weights: "transform.py"
 ```
 
 <img width="454" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/38a2ac71-e884-450d-8cb2-c37cdf508ea9">
@@ -1183,7 +1154,7 @@ git push # 输入用户名和密码
 
 <img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
 
-## modelscope部署
+## openxlab部署
 
 创建 app.py 添加至代码仓库
 ```Bash
@@ -1209,28 +1180,6 @@ streamlit
 lagent
 onnxruntime-gpu
 openxlab
-```
-
-修改react_Oculi_web_demo.py的main
-
-```Bash
-MODEL_DIR = "./OpenLMLab/InternLM2-chat-7b"
-
-if __name__ == '__main__':
-    root_dir = "tmp_dir"
-    os.makedirs(root_dir, exist_ok=True)
-    if not os.path.exists(MODEL_DIR):
-        from openxlab.model import download
-
-        download(model_repo='OpenLMLab/internlm2-chat-7b', output=MODEL_DIR)
-
-        print("解压后目录结果如下：")
-        print(os.listdir(MODEL_DIR))
-
-    # root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    # root_dir = os.path.join(root_dir, 'tmp_dir')
-    # os.makedirs(root_dir, exist_ok=True)
-    main()
 ```
 
 <img width="264" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0b677ea5-636e-440d-9135-78d96a9daa6d">
