@@ -1193,15 +1193,10 @@ if __name__ == '__main__':
     os.system('streamlit run react_Oculi_web_demo.py --server.address 0.0.0.0 --server.port 7860 --server.enableStaticServing True')
 ```
 
-<img width="264" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0b677ea5-636e-440d-9135-78d96a9daa6d">
-
-<img width="756" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/75bc4491-b0ad-452d-a23e-a7f1a2b7e2de">
-
-<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe1c9f70-c8a8-437a-addb-a5eea84bae07">
-
 创建requirements.txt
 
 ```Bash
+os
 pandas
 python-docx
 torch
@@ -1215,3 +1210,30 @@ lagent
 onnxruntime-gpu
 openxlab
 ```
+
+修改react_Oculi_web_demo.py的main()函数
+
+```Bash
+if __name__ == '__main__':
+    root_dir = "tmp_dir"
+    os.makedirs(root_dir, exist_ok=True)
+    if not os.path.exists(MODEL_DIR):
+        from openxlab.model import download
+
+        download(model_repo='OpenLMLab/internlm2-chat-7b', output=MODEL_DIR)
+
+        print("解压后目录结果如下：")
+        print(os.listdir(MODEL_DIR))
+
+    # root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # root_dir = os.path.join(root_dir, 'tmp_dir')
+    # os.makedirs(root_dir, exist_ok=True)
+    main()
+```
+
+<img width="264" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0b677ea5-636e-440d-9135-78d96a9daa6d">
+
+<img width="756" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/75bc4491-b0ad-452d-a23e-a7f1a2b7e2de">
+
+<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe1c9f70-c8a8-437a-addb-a5eea84bae07">
+
