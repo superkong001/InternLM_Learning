@@ -888,13 +888,13 @@ Collections:
   Framework: "[]"
   Paper: {}
   Code:
-    URL: "https://github.com/InternLM/InternLM"
+    URL: "https://github.com/superkong001/Oculi-InternLM"
 Models:
 - Name: "config.json"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
-- Name: "configuration_internlm.py"
+- Name: "configuration_internlm2.py"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
@@ -942,7 +942,7 @@ Models:
   Results:
   - Task: "Text Generation"
     Dataset: "none"
-- Name: "tokenization_internlm.py"
+- Name: "tokenization_internlm2.py"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
@@ -959,6 +959,18 @@ Models:
   - Task: "Text Generation"
     Dataset: "none"
 - Name: "pytorch_model.bin.index.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "react_Oculi_web_demo.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "fundus_diagnosis.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+- Name: "transform.py"
   Results:
   - Task: "Text Generation"
     Dataset: "none"
@@ -995,7 +1007,121 @@ print("Modifications saved to the file.")
 
 python convert.py 生成好带weight的 metafile.yml
 
-手工修改，将 Name 改为 Oculi-InternLM2，URL改为https://github.com/superkong001/Oculi-InternLM, configuration_internlm.py改为 configuration_internlm2.py、tokenization_internlm.py 改为 tokenization_internlm2.py
+```Bash
+Collections:
+- Name: "internlm2-chat-7b"
+  License: "Apache-2.0"
+  Framework: "[]"
+  Paper: {}
+  Code:
+    URL: "https://github.com/superkong001/Oculi-InternLM"
+Models:
+- Name: "config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "config.json"
+- Name: "configuration_internlm2.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "configuration_internlm2.py"
+- Name: "generation_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "generation_config.json"
+- Name: "modeling_internlm2.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "modeling_internlm2.py"
+- Name: "pytorch_model-00001-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00001-of-00008.bin"
+- Name: "pytorch_model-00002-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00002-of-00008.bin"
+- Name: "pytorch_model-00003-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00003-of-00008.bin"
+- Name: "pytorch_model-00004-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00004-of-00008.bin"
+- Name: "pytorch_model-00005-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00005-of-00008.bin"
+- Name: "pytorch_model-00006-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00006-of-00008.bin"
+- Name: "pytorch_model-00007-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00007-of-00008.bin"
+- Name: "pytorch_model-00008-of-00008.bin"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model-00008-of-00008.bin"
+- Name: "special_tokens_map.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "special_tokens_map.json"
+- Name: "tokenization_internlm2.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "tokenization_internlm2.py"
+- Name: "tokenizer_config.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "tokenizer_config.json"
+- Name: "tokenizer.model"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "tokenizer.model"
+- Name: "README.md"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "README.md"
+- Name: "pytorch_model.bin.index.json"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "pytorch_model.bin.index.json"
+- Name: "react_Oculi_web_demo.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "react_Oculi_web_demo.py"
+- Name: "fundus_diagnosis.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "fundus_diagnosis.py"
+- Name: "transform.py"
+  Results:
+  - Task: "Text Generation"
+    Dataset: "none"
+  Weights: "transform.py"
+```
 
 <img width="454" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/38a2ac71-e884-450d-8cb2-c37cdf508ea9">
 
@@ -1040,7 +1166,7 @@ git clone https://www.modelscope.cn/teloskong/Oculi-InternLM2.git
 
 # 将 /root/ft-Oculi/merged_Oculi模型文件覆盖 Oculi-InternLM2 下的文件
 cd Oculi-InternLM2/
-cp /root/ft-Oculi/merged_Oculi/* .
+cp -r /root/ft-Oculi/merged_Oculi/* .
 cp /root/ft-Oculi/merged_Oculi/README.md .
 ```
 
@@ -1050,14 +1176,26 @@ cp /root/ft-Oculi/merged_Oculi/README.md .
 git add *
 git config --global user.name "teloskong"
 git commit -m "Oculi-InternLM2 Model V20240204"
+git push # 输入用户名和密码
 ```
 
 <img width="758" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/44340069-fd26-42d2-8dd2-bf4967c64284">
 
+## modelscope部署
+
+创建 app.py 添加至代码仓库
 ```Bash
-git push
+import os
+
+if __name__ == '__main__':
+    os.system('streamlit run react_Oculi_web_demo.py --server.address 0.0.0.0 --server.port 7860 --server.enableStaticServing True')
 ```
 
-<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
+<img width="264" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/0b677ea5-636e-440d-9135-78d96a9daa6d">
 
+<img width="756" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/75bc4491-b0ad-452d-a23e-a7f1a2b7e2de">
+
+<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe1c9f70-c8a8-437a-addb-a5eea84bae07">
+
+<img width="709" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f22399d-d613-417e-9f3d-d9e041024f9c">
 
