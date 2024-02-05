@@ -1199,5 +1199,30 @@ if __name__ == '__main__':
 
 <img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/fe1c9f70-c8a8-437a-addb-a5eea84bae07">
 
-<img width="665" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/827638aa-0ba4-4018-8b02-bc62e6d9e05f">
+创建requirements.txt
 
+```Bash
+modelscope==1.9.5 
+transformers==4.35.2 
+sentencepiece==0.1.99 
+accelerate==0.24.1
+streamlit==1.25.0
+numpy
+tqdm
+psutil
+packaging
+pre-commit
+ninja
+gputil
+pytest
+packaging
+boto3
+botocore
+torch-scatter
+pyecharts
+
+#--extra-index-url https://download.pytorch.org/whl/cu117
+#torch==1.13.1+cu117
+#torchvision==0.14.1+cu117
+#torchaudio==0.13.1
+```
