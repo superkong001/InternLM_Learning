@@ -1211,9 +1211,11 @@ onnxruntime-gpu
 openxlab
 ```
 
-修改react_Oculi_web_demo.py的main()函数
+修改react_Oculi_web_demo.py的main
 
 ```Bash
+MODEL_DIR = "./OpenLMLab/InternLM2-chat-7b"
+
 if __name__ == '__main__':
     root_dir = "tmp_dir"
     os.makedirs(root_dir, exist_ok=True)
