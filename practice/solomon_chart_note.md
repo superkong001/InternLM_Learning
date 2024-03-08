@@ -11,6 +11,7 @@ conda activate solomon_chart
 mkdir ~/xtuner && cd ~/xtuner
 git clone https://github.com/InternLM/xtuner.git
 cd xtuner
+# tips: xtuner的requests==2.31.0与openxlab的版本冲突、transformers>=4.34.0,!=4.34.1,!=4.35.0,!=4.35.1,!=4.35.2
 pip install -e '.[all]'
 # 列出所有内置配置
 xtuner list-cfg
@@ -301,6 +302,117 @@ ssh -CNg -L 6006:127.0.0.1:6006 root@ssh.intern-ai.org.cn -p 37660(修改对应�
 
 <img width="829" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/4b8f2d71-7f11-4d39-a3a5-55de40846828">
 
+# 量化模型
+
+```Bash
+# requirements
+python 3.8+
+lmdeploy
+torch<=2.1.2,>=2.0.0
+transformers>=4.33.0,<=4.38.1
+triton>=2.1.0,<=2.2.0
+gradio<4.0.0
+```
+
+## 安装 lmdeploy
+
+```Bash
+# 解决 ModuleNotFoundError: No module named 'packaging' 问题
+pip install packaging
+# 使用 flash_attn 的预编译包解决安装过慢问题
+pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
+
+# pip install 'lmdeploy[all]==v0.1.0'
+pip install lmdeploy
+```
+
+lmdeploy convert internlm2-chat-7b /root/solomon/merged_solomon_1000/
+
+## 开启 KV Cache INT8 
+
+(当显存不足，或序列比较长时)
+
+kv cache PTQ 量化，使用的公式如下：
+
+```Bash
+zp = (min+max) / 2
+scale = (max-min) / 255
+quant: q = round( (f-zp) / scale)
+dequant: f = q * scale + zp
+```
+
+获取量化参数，并保存至原HF模型目录
+
+```Bash
+# get minmax
+export HF_MODEL=/root/solomon/merged_solomon_1000/
+
+lmdeploy lite calibrate \
+  $HF_MODEL \
+  --calib-dataset 'ptb' \
+  --calib-samples 128 \
+  --calib-seqlen 2048 \
+  --work-dir $HF_MODEL
+```
+
+测试聊天效果。注意需要添加参数--quant-policy 4以开启KV Cache int8模式。
+
+```Bash
+lmdeploy chat turbomind $HF_MODEL --model-format hf --quant-policy 4
+```
+
+## w4a16
+
+没有 GPU 卡，只有 CPU，尝试量化版本。W4A16中的A是指Activation，保持FP16，只对参数进行 4bit 量化。
+
+量化结束后，权重文件存放在 $WORK_DIR 下
+
+```Bash
+# LMDeploy 使用 AWQ 算法，实现模型 4bit 权重量化
+export HF_MODEL=/root/solomon/merged_solomon_1000/
+export WORK_DIR=/root/solomon/merged_solomon_1000-4bit/
+
+# 量化权重模型
+# w_bits 表示量化的位数，w_group_size 表示量化分组统计的尺寸，work_dir 是量化后模型输出的位置。
+lmdeploy lite auto_awq \
+   $HF_MODEL \                       # Model name or path, either model repo name on huggingface hub like 'internlm/internlm-chat-7b', or a model path in local host
+  --calib-dataset 'ptb' \            # Calibration dataset, supports c4, ptb, wikitext2, pileval
+  --calib-samples 128 \              # Number of samples in the calibration set, if memory is insufficient, you can appropriately reduce this
+  --calib-seqlen 2048 \              # Length of a single piece of text, if memory is insufficient, you can appropriately reduce this
+  --w-bits 4 \                       # Bit number for weight quantization
+  --w-group-size 128 \               # Group size for weight quantization statistics
+  --work-dir $WORK_DIR               # Folder storing Pytorch format quantization statistics parameters and post-quantization weight
+
+lmdeploy lite auto_awq \
+   $HF_MODEL \
+  --calib-dataset 'ptb' \
+  --calib-samples 128 \
+  --calib-seqlen 2048 \
+  --w-bits 4 \
+  --w-group-size 128 \
+  --work-dir $WORK_DIR
+```
+
+# 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
+lmdeploy convert internlm-chat-7b  /root/share/temp/model_repos/internlm-chat-7b/
+
+lmdeploy convert  internlm-chat-7b ./quant_output \
+    --model-format awq \
+    --group-size 128 \
+    --dst_path ./workspace_quant
+    
+测试效果
+
+```Bash
+# 直接在控制台和模型对话
+lmdeploy chat turbomind ./merged_solomon_1000-4bit --model-format awq
+# kCacheKVInt8 和 WeightInt4 两种方案可以同时开启
+lmdeploy chat turbomind ./merged_solomon_1000-4bit --model-format awq --quant-policy 4
+# 启动gradio服务
+lmdeploy serve gradio ./merged_solomon_1000-4bit --server-name {ip_addr} --server-port {port} --model-format awq
+在浏览器中打开 http://{ip_addr}:{port}，即可在线对话
+```
+
 # 模型上传和部署openxlab
 
 ## 模型上传准备工作
@@ -449,9 +561,16 @@ openxlab model create --model-repo='superkong001/solomon_chart' -s ./metafile.ym
 Tips：漏改的话继续上传，新建并编辑一个upload1.yml
 
 ```Bash
+# 部分上传：
 python
 from openxlab.model import upload 
-upload(model_repo='superkong001/solomon_chart', file_type='metafile',source="upload1.yml")
+upload(model_repo='superkong001/solomon_chart', file_type='metafile', source="upload1.yml")
+
+# 全量更新：
+python
+from openxlab.model import upload
+upload(model_repo='superkong001/solomon_chart', file_type='metafile', source="metafile.yml")
+
 ```
 
 <img width="812" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/f173bd93-4ea7-4648-ab9e-9053a18b51f4">
@@ -555,6 +674,8 @@ openxlab
 ```
 
 <img width="449" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/9b82645f-55b1-443c-9915-b5d2ced6a549">
+
+<img width="650" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/23c0951a-dc09-4f8f-a744-252625da1400">
 
 <img width="860" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/9b03207c-348a-40ef-a49d-3247106c4048">
 
