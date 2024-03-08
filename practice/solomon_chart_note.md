@@ -326,7 +326,20 @@ pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-
 pip install lmdeploy
 ```
 
+离线转换
+
+```Bash
+# 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
 lmdeploy convert internlm2-chat-7b /root/solomon/merged_solomon_1000/
+```
+
+执行完成后将会在当前目录生成一个 workspace 的文件夹。这里面包含的就是 TurboMind 和 Triton “模型推理”需要到的文件。
+
+<img width="425" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4c153fc3-713c-4586-8289-3ef8ca7e8404">
+
+weights 和 tokenizer 目录分别放的是拆分后的参数和 Tokenizer
+
+每一份参数第一个 0 表示“层”的索引，后面的那个0表示 Tensor 并行的索引，因为我们只有一张卡，所以被拆分成 1 份。如果有两张卡可以用来推理，则会生成0和1两份，也就是说，会把同一个参数拆成两份。比如 layers.0.attention.w_qkv.0.weight 会变成 layers.0.attention.w_qkv.0.weight 和 layers.0.attention.w_qkv.1.weight。执行 lmdeploy convert 命令时，可以通过 --tp 指定（tp 表示 tensor parallel），该参数默认值为1（也就是一张卡）
 
 ## 开启 KV Cache INT8 
 
