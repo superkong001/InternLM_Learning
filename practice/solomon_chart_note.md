@@ -496,6 +496,34 @@ def load_model():
 + st.title('InternLM2-Chat-7B 亚里士多德')
 ```
 
+
+# 模型上传modelscope
+
+在modelscope创建模型solomon_chart：
+
+<img width="727" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/af8002c2-38d5-4060-b597-dc3bd8391a27">
+
+```Bash
+mkdir ~/modelscope
+cd ~/modelscope
+apt-get install git-lfs
+# 需要公开后才能下载
+git clone https://www.modelscope.cn/teloskong/solomon_chart.git
+
+# 将 /root/solomon/merged_solomon_1000 模型文件覆盖 ~/modelscope/solomon_chart 下的文件
+cd solomon_chart/
+cp -r /root/solomon/merged_solomon_1000/* .
+
+# 上传模型文件
+git add *
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git commit -m "solomon_chart Model V20240308"
+git push # 输入用户名和Git 访问令牌
+```
+
+<img width="742" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b929b0a2-8ab4-486d-a668-2f21f6646156">
+
 ## openxlab部署
 
 创建 app.py 添加至代码仓库
@@ -523,23 +551,3 @@ openxlab
 <img width="860" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/9b03207c-348a-40ef-a49d-3247106c4048">
 
 
-# 模型上传modelscope
-
-```Bash
-mkdir ~/modelscope
-cd ~/modelscope
-apt-get install git-lfs
-git clone https://www.modelscope.cn/teloskong/solomon_chart.git
-
-# 将 /root/solomon/merged_solomon_1000 模型文件覆盖 ~/modelscope/solomon_chart 下的文件
-cd solomon_chart/
-cp -r /root/solomon/merged_solomon_1000/* .
-cp /root/solomon/merged_Oculi/README.md .
-```
-
-```Bash
-git add *
-git config --global user.name "teloskong"
-git commit -m "Oculi-InternLM2 Model V20240204"
-git push # 输入用户名和密码
-```
