@@ -464,13 +464,10 @@ upload(model_repo='superkong001/solomon_chart', file_type='metafile',source="upl
 
 ```Bash
 + from modelscope import snapshot_download
-
-# 定义模型路径
-+ model_id = 'telos/solomon_chart'
-+ mode_name_or_path = snapshot_download(model_id, revision='master')
++ from openxlab.model import download
 
 # 修改load_model
-def load_model():
+- def load_model():
     model = (AutoModelForCausalLM.from_pretrained('/root/solomon/merged_solomon_1000',
                                                   trust_remote_code=True).to(
                                                       torch.bfloat16).cuda())
@@ -479,7 +476,17 @@ def load_model():
     return model, tokenizer
 
 # 改为：
-def load_model():
++ def load_model():
+    # 定义模型路径(modelscope)
+    # model_id = 'teloskong/solomon_chart'
+    # mode_name_or_path = snapshot_download(model_id, revision='master')
+
+    # 定义模型路径(xlab)
+    model_id = 'telos/solomon_chart'
+    download(model_repo='telos/solomon_chart', 
+        model_name='solomon_chart', output='/home/xlab-app-center')
+    mode_name_or_path = '/home/xlab-app-center'
+
     # 从预训练的模型中获取模型，并设置模型参数
     model = (AutoModelForCausalLM.from_pretrained(mode_name_or_path,
                                                   trust_remote_code=True).to(
@@ -495,7 +502,6 @@ def load_model():
 + robot_avator = mode_name_or_path + '/Aristotle.png'
 + st.title('InternLM2-Chat-7B 亚里士多德')
 ```
-
 
 # 模型上传modelscope
 
@@ -547,6 +553,8 @@ xtuner
 streamlit
 openxlab
 ```
+
+<img width="449" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/9b82645f-55b1-443c-9915-b5d2ced6a549">
 
 <img width="860" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/9b03207c-348a-40ef-a49d-3247106c4048">
 
