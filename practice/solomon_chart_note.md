@@ -333,6 +333,8 @@ pip install lmdeploy=0.2.5
 lmdeploy convert internlm2-chat-7b /root/solomon/merged_solomon_1000/
 ```
 
+<img width="791" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/650e01ec-38c8-4b36-a922-57f9be31e0ab">
+
 执行完成后将会在当前目录生成一个 workspace 的文件夹。这里面包含的就是 TurboMind 和 Triton “模型推理”需要到的文件。
 
 <img width="425" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4c153fc3-713c-4586-8289-3ef8ca7e8404">
