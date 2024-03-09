@@ -374,8 +374,8 @@ lmdeploy lite calibrate \
 
 <img width="418" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3134fd0c-f7fe-4615-b809-98192995b44b">
 
-![image](https://github.com/superkong001/InternLM_Learning/assets/37318654/c44d36b4-f190-4274-ad29-0dd52a6eecd3)
-<img width="211" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4997aab4-bc42-4a9f-8800-4510d394f052">
+<img width="225" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/5de45173-77bd-404e-b50d-deaaa0f05d19">
+<img width="225" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4997aab4-bc42-4a9f-8800-4510d394f052">
 
 
 对比原来多了4个文件。
