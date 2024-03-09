@@ -7,7 +7,7 @@ conda create --name solomon_chart python=3.10 -y
 conda info -e
 conda activate solomon_chart
 
-# 按照xtuner
+# 安装xtuner（v0.1.15）
 mkdir ~/xtuner && cd ~/xtuner
 git clone https://github.com/InternLM/xtuner.git
 cd xtuner
@@ -291,7 +291,7 @@ vim web_solomon.py
 + robot_avator = '/root/code/data/Aristotle.png'
 + st.title('与古希腊哲学家思辨')
 
-pip install streamlit
+pip install streamlit==v1.31.1
 
 streamlit run /root/code/web_solomon.py --server.address 127.0.0.1 --server.port 6006
 
@@ -323,7 +323,7 @@ pip install packaging
 pip install /root/share/wheels/flash_attn-2.4.2+cu118torch2.0cxx11abiTRUE-cp310-cp310-linux_x86_64.whl
 
 # pip install 'lmdeploy[all]==v0.1.0'
-pip install lmdeploy
+pip install lmdeploy=0.2.5
 ```
 
 离线转换
