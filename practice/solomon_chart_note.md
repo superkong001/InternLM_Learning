@@ -394,7 +394,7 @@ lmdeploy chat turbomind $HF_MODEL --model-format hf --quant-policy 4
 
 <img width="724" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b6db7071-cec1-4f84-b671-2d4758ac8238">
 
-1/4的A100,20G显存爆了，调小 samples 的数量和sample 的长度
+1/4的A100,20G显存爆了，调小 samples 的数量和sample 的长度，试了还是不行
 
 ```Bash
 lmdeploy lite calibrate \
@@ -417,6 +417,7 @@ lmdeploy lite calibrate \
 # LMDeploy 使用 AWQ 算法，实现模型 4bit 权重量化
 export HF_MODEL=/root/solomon/merged_solomon_1000/
 export WORK_DIR=/root/solomon/merged_solomon_1000-4bit/
+pip install fuzzywuzzy
 
 # 量化权重模型
 # w_bits 表示量化的位数，w_group_size 表示量化分组统计的尺寸，work_dir 是量化后模型输出的位置。
