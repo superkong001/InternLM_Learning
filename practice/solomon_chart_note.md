@@ -343,6 +343,8 @@ weights 和 tokenizer 目录分别放的是拆分后的参数和 Tokenizer
 
 每一份参数第一个 0 表示“层”的索引，后面的那个0表示 Tensor 并行的索引，因为我们只有一张卡，所以被拆分成 1 份。如果有两张卡可以用来推理，则会生成0和1两份，也就是说，会把同一个参数拆成两份。比如 layers.0.attention.w_qkv.0.weight 会变成 layers.0.attention.w_qkv.0.weight 和 layers.0.attention.w_qkv.1.weight。执行 lmdeploy convert 命令时，可以通过 --tp 指定（tp 表示 tensor parallel），该参数默认值为1（也就是一张卡）
 
+<img width="371" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/41646fd8-557c-4e4d-aa89-dc89250ce891">
+
 ## 开启 KV Cache INT8 
 
 (当显存不足，或序列比较长时)
@@ -369,6 +371,10 @@ lmdeploy lite calibrate \
   --calib-seqlen 2048 \
   --work-dir $HF_MODEL
 ```
+
+<img width="418" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3134fd0c-f7fe-4615-b809-98192995b44b">
+
+<img width="211" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/6145625b-9ed8-4203-8345-6f6863528519">
 
 测试聊天效果。注意需要添加参数--quant-policy 4以开启KV Cache int8模式。
 
