@@ -440,19 +440,35 @@ lmdeploy lite auto_awq \
   --work-dir $WORK_DIR
 ```
 
-# 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
-lmdeploy convert internlm-chat-7b  /root/share/temp/model_repos/internlm-chat-7b/
+<img width="377" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/2c2e8d74-327e-4716-a32c-c0c7ee18aa9c">
 
-lmdeploy convert  internlm-chat-7b ./quant_output \
-    --model-format awq \
-    --group-size 128 \
-    --dst_path ./workspace_quant
-    
-测试效果
+<img width="207" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/e0002754-60bd-45da-bea4-7ac2bb59b3f1">
+
+测试INT4 模型量化效果
 
 ```Bash
 # 直接在控制台和模型对话
 lmdeploy chat turbomind ./merged_solomon_1000-4bit --model-format awq
+
+<img width="255" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/73267d5b-3965-458f-9062-b5e945078d3f">
+
+<img width="758" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/8a9338e7-e641-4e94-b185-f49f241114a6">
+```
+
+```Bash
+# 直接对internlm2-chat-7b量化测试
+export HF_MODEL=/root/solomon/internlm2-chat-7b
+export WORK_DIR=/root/solomon/internlm2-chat-7b-4bit
+
+lmdeploy chat turbomind ./internlm2-chat-7b-4bit --model-format awq
+```
+
+同样报错，看来InternLM2量化还不行
+
+<img width="767" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/a496cd4a-3fbe-4b46-a163-67c31e97d8cf">
+
+
+```Bash
 # kCacheKVInt8 和 WeightInt4 两种方案可以同时开启
 lmdeploy chat turbomind ./merged_solomon_1000-4bit --model-format awq --quant-policy 4
 # 启动gradio服务
