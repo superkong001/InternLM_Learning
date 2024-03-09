@@ -330,6 +330,7 @@ pip install lmdeploy=0.2.5
 
 ```Bash
 # 转换模型（FastTransformer格式） 把 huggingface 格式的模型，转成 turbomind 推理格式，得到一个 workspace 目录
+# 转换模型的layout，存放在默认路径 ./workspace 下
 lmdeploy convert internlm2-chat-7b /root/solomon/merged_solomon_1000/
 ```
 
@@ -345,7 +346,7 @@ weights 和 tokenizer 目录分别放的是拆分后的参数和 Tokenizer
 
 <img width="371" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/41646fd8-557c-4e4d-aa89-dc89250ce891">
 
-## 开启 KV Cache INT8 
+## 开启 KV Cache INT8 量化
 
 (当显存不足，或序列比较长时)
 
@@ -358,25 +359,30 @@ quant: q = round( (f-zp) / scale)
 dequant: f = q * scale + zp
 ```
 
-获取量化参数，并保存至原HF模型目录
+第一步执行命令获取量化参数，并保存至quant_output目录
 
 ```Bash
-# get minmax
 export HF_MODEL=/root/solomon/merged_solomon_1000/
 
+# 计算 minmax
 lmdeploy lite calibrate \
   $HF_MODEL \
   --calib-dataset 'ptb' \
-  --calib-samples 128 \
-  --calib-seqlen 2048 \
+  --calib-samples 64 \
+  --calib-seqlen 1024 \
   --work-dir $HF_MODEL
 ```
+
+这个命令行中选择 128 条输入样本，每条样本长度为 2048，数据集选择 ptb，输入模型后就会得到上面的各种统计值。
+
+如果显存不足，可以适当调小 samples 的数量或 sample 的长度。
 
 <img width="418" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/3134fd0c-f7fe-4615-b809-98192995b44b">
 
 <img width="225" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/5de45173-77bd-404e-b50d-deaaa0f05d19">
 <img width="225" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4997aab4-bc42-4a9f-8800-4510d394f052">
 
+<img width="124" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/29306a6d-4207-4a44-9554-202514f0253f">
 
 对比原来多了4个文件。
 
@@ -385,6 +391,21 @@ lmdeploy lite calibrate \
 ```Bash
 lmdeploy chat turbomind $HF_MODEL --model-format hf --quant-policy 4
 ```
+
+<img width="724" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/b6db7071-cec1-4f84-b671-2d4758ac8238">
+
+1/4的A100,20G显存爆了，调小 samples 的数量和sample 的长度
+
+```Bash
+lmdeploy lite calibrate \
+  $HF_MODEL \
+  --calib-dataset 'ptb' \
+  --calib-samples 64 \
+  --calib-seqlen 1024 \
+  --work-dir $HF_MODEL
+```
+
+<img width="371" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/988d2b45-0324-4ebc-9458-b788d9ea7ec5">
 
 ## w4a16
 
