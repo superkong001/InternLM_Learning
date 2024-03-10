@@ -196,7 +196,7 @@ train_dataset = dict(
 xtuner copy-cfg internlm2_chat_7b_full_finetune_custom_dataset_e1 .
 cp internlm2_chat_7b_full_finetune_custom_dataset_e1_copy.py internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
 
-vim internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py
+vim internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
 
 + from mmengine.config import read_base
 - from xtuner.dataset.map_fns import template_map_fn_factory
@@ -204,13 +204,22 @@ vim internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py
                            VarlenAttnArgsToMessageHubHook)
 + from xtuner.engine import DatasetInfoHook
 
-+with read_base():
++ with read_base():
 +    from .map_fn import single_turn_map_fn as dataset_map_fn
 
 # PART 1  Settings
+- pretrained_model_name_or_path = 'internlm/internlm2-chat-7b'
++ pretrained_model_name_or_path = '/root/solomon/internlm2-chat-7b'
 - data_files = ['/path/to/json/file.json']
 + data_path = './Aristotle_doc.json'
 - prompt_template = PROMPT_TEMPLATE.internlm2_chat
+
+- evaluation_inputs = [
+        '请给我介绍五个上海的景点', 'Please tell me five scenic spots in Shanghai'
+    ]
+= evaluation_inputs = [
+        '你好, 人生的终极价值体现在什么方面？', '请介绍一下你自己', '自我放纵的后果是什么？', '什么是罪恶的本质？'
+    ]
 
 # PART 3  Dataset & Dataloader
 - dataset_map_fn=None,
@@ -240,7 +249,7 @@ vim internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py
 
 ### pretrain
 
-xtuner train /root/solomon/internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py --deepspeed deepspeed_zero2
+xtuner train /root/solomon/internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py --deepspeed deepspeed_zero2
 
 ### qlora微调
 ```Bash
