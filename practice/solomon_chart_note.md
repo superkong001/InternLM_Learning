@@ -116,11 +116,21 @@ python 编写process_txt_to_json.py data
 
 ```Bash
 # 列出所有内置配置
-xtuner list-cfg
+xtuner list-cfg | grep "internlm2_chat_7b"
+internlm2_chat_7b_full_finetune_custom_dataset_e1
+internlm2_chat_7b_qlora_alpaca_e3
+internlm2_chat_7b_qlora_code_alpaca_e3
+internlm2_chat_7b_qlora_lawyer_e3
+internlm2_chat_7b_qlora_oasst1_512_e3
+internlm2_chat_7b_qlora_oasst1_e3
 
 cd ~/solomon
 xtuner copy-cfg internlm2_chat_7b_qlora_oasst1_e3 .
+```
 
+### qlora
+
+```Bash
 # 修改配置文件
 # 改个文件名
 cp internlm2_chat_7b_qlora_oasst1_e3_copy.py internlm2_chat_7b_qlora_solomon_e3_copy.py
@@ -142,7 +152,7 @@ vim internlm2_chat_7b_qlora_solomon_e3_copy.py
 
 # 修改训练数据为 MedQA2019-structured-train.jsonl 路径
 - data_path = 'timdettmers/openassistant-guanaco'
-+ data_path = '/root/solomon/data/train_data/Aristotle_doc_all.json'
++ data_path = '/root/solomon/data/train_data/Aristotle_qlora.json'
 
 # 原始2400条数据，保证总训练数据在2万条以上，2400*10=2.4万
 - max_epochs= 3
@@ -180,8 +190,59 @@ train_dataset = dict(
     pack_to_max_length=pack_to_max_length)
 ```
 
+### full_finetune（pretrain）
+
+```Bash
+xtuner copy-cfg internlm2_chat_7b_full_finetune_custom_dataset_e1 .
+cp internlm2_chat_7b_full_finetune_custom_dataset_e1_copy.py internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
+
+vim internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py
+
++ from mmengine.config import read_base
+- from xtuner.dataset.map_fns import template_map_fn_factory
+- from xtuner.engine import (DatasetInfoHook, EvaluateChatHook, ThroughputHook,
+                           VarlenAttnArgsToMessageHubHook)
++ from xtuner.engine import DatasetInfoHook
+
++with read_base():
++    from .map_fn import single_turn_map_fn as dataset_map_fn
+
+# PART 1  Settings
+- data_files = ['/path/to/json/file.json']
++ data_path = './Aristotle_doc.json'
+- prompt_template = PROMPT_TEMPLATE.internlm2_chat
+
+# PART 3  Dataset & Dataloader
+- dataset_map_fn=None,
++ dataset_map_fn=dataset_map_fn,
+- template_map_fn=dict(
+            type=template_map_fn_factory, template=prompt_template),
++ template_map_fn=None,
+
+# PART 5  Runtime
+- custom_hooks = [
+        dict(
+            type=DatasetInfoHook, tokenizer=tokenizer,
+            is_intern_repo_dataset=True),
+        dict(
+            type=EvaluateChatHook,
+            tokenizer=tokenizer,
+            every_n_iters=evaluation_freq,
+            evaluation_inputs=evaluation_inputs,
+            system=SYSTEM,
+            prompt_template=prompt_template),
+        dict(type=ThroughputHook)
+    ]
++ custom_hooks = [dict(type=DatasetInfoHook, tokenizer=tokenizer)]
+```
 
 ## 微调
+
+### pretrain
+
+xtuner train /root/solomon/internlm2_chat_7b_full_finetune_custom_solomon_dataset_e1_copy.py --deepspeed deepspeed_zero2
+
+### qlora微调
 ```Bash
 # 单卡
 cd ~/solomon/
