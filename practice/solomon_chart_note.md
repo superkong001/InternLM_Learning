@@ -217,7 +217,7 @@ vim internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
 - evaluation_inputs = [
         '请给我介绍五个上海的景点', 'Please tell me five scenic spots in Shanghai'
     ]
-= evaluation_inputs = [
++ evaluation_inputs = [
         '你好, 人生的终极价值体现在什么方面？', '请介绍一下你自己', '自我放纵的后果是什么？', '什么是罪恶的本质？'
     ]
 
