@@ -730,27 +730,35 @@ upload(model_repo='superkong001/solomon_chart', file_type='metafile', source="me
 
 # 改为：
 + def load_model():
-    # 定义模型路径(modelscope)
-    # model_id = 'teloskong/solomon_chart'
-    # mode_name_or_path = snapshot_download(model_id, revision='master')
+   # 定义模型路径(modelscope)
+    model_id = "teloskong/solomon_chart"
+    model = (
+        AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
+        .to(torch.bfloat16)
+        .cuda()
+    )
+    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+    
+    mode_name_or_path = snapshot_download(model_id, revision='master')
 
     # 定义模型路径(xlab)
-    model_id = 'telos/solomon_chart'
-    download(model_repo='telos/solomon_chart', 
-        model_name='solomon_chart', output='/home/xlab-app-center')
-    mode_name_or_path = '/home/xlab-app-center'
+    # model_id = 'telos/solomon_chart'
+    # download(model_repo='telos/solomon_chart', 
+    #     model_name='solomon_chart', output='/home/xlab-app-center/.cache/model')
+    # mode_name_or_path = '/home/xlab-app-center/.cache/model'
 
     # 从预训练的模型中获取模型，并设置模型参数
-    model = (AutoModelForCausalLM.from_pretrained(mode_name_or_path,
-                                                  trust_remote_code=True).to(
-                                                      torch.bfloat16).cuda())
-    # 从预训练的模型中获取tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(mode_name_or_path,
-                                              trust_remote_code=True)
-    model.eval()  
-    return model, tokenizer
+    # model = (AutoModelForCausalLM.from_pretrained(mode_name_or_path,
+    #                                               trust_remote_code=True).to(
+    #                                                   torch.bfloat16).cuda())
+    # # 从预训练的模型中获取tokenizer
+    # tokenizer = AutoTokenizer.from_pretrained(mode_name_or_path,
+    #                                           trust_remote_code=True)
+    # model.eval()  
+    return model, tokenizer, mode_name_or_path
 
 # 修改main函数
++ model, tokenizer, mode_name_or_path = load_model()
 + user_avator = mode_name_or_path + '/user.png'
 + robot_avator = mode_name_or_path + '/Aristotle.png'
 + st.title('InternLM2-Chat-7B 亚里士多德')
