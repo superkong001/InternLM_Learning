@@ -212,6 +212,7 @@ vim internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
 + pretrained_model_name_or_path = '/root/solomon/internlm2-chat-7b'
 - data_files = ['/path/to/json/file.json']
 + data_path = './Aristotle_doc.json'
++ data_files = ['./Aristotle_doc.json']
 - prompt_template = PROMPT_TEMPLATE.internlm2_chat
 
 - evaluation_inputs = [
@@ -219,7 +220,7 @@ vim internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
     ]
 + evaluation_inputs = [
         '你好, 人生的终极价值体现在什么方面？', '请介绍一下你自己', '自我放纵的后果是什么？', '什么是罪恶的本质？'
-    ]
+]
 
 # PART 3  Dataset & Dataloader
 - dataset_map_fn=None,
