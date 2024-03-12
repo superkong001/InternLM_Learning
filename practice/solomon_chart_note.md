@@ -252,6 +252,8 @@ vim internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py
 
 xtuner train /root/solomon/internlm2_chat_7b_full_finetune_solomon_ds_e1_copy.py --deepspeed deepspeed_zero2
 
+tip：调测失败，官方样例不适用新版xtune和interlm2的，后续有时间再调整
+
 ### qlora微调
 ```Bash
 # 单卡
