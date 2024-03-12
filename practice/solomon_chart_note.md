@@ -759,8 +759,8 @@ upload(model_repo='superkong001/solomon_chart', file_type='metafile', source="me
 
 # 修改main函数
 + model, tokenizer, mode_name_or_path = load_model()
-+ user_avator = mode_name_or_path + '/user.png'
-+ robot_avator = mode_name_or_path + '/Aristotle.png'
++ user_avator = './user.png'
++ robot_avator = './Aristotle.png'
 + st.title('InternLM2-Chat-7B 亚里士多德')
 ```
 
@@ -820,5 +820,9 @@ openxlab
 <img width="650" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/23c0951a-dc09-4f8f-a744-252625da1400">
 
 <img width="860" alt="image" src="https://github.com/superkong001/InternLM_project/assets/37318654/9b03207c-348a-40ef-a49d-3247106c4048">
+
+<img width="794" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/c8ca2572-2503-4dc0-86b0-d9439fa060ad">
+
+<img width="565" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/4f734220-c300-4697-bc30-435d4de6ac9d">
 
 
