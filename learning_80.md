@@ -8,6 +8,9 @@
 
 <img width="811" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/d133c2eb-6339-449a-bd16-868b005c3e4d">
 
+ssh -p 34531 root@ssh.intern-ai.org.cn -CNg -L 7860:127.0.0.1:7860 -o StrictHostKeyChecking=no
+
+<img width="653" alt="image" src="https://github.com/superkong001/InternLM_Learning/assets/37318654/ac928260-54a8-49f5-a0d7-577aa43292b6">
 
 
 
